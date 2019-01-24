@@ -33,6 +33,7 @@
     "angular-leaflet-directive": "^0.8.8",
     "free-jqgrid": "^4.15.5",
     "jquery": "^3.3.1",
+    "jquery-ui": "^1.12.1",
     "jsdom": "^13.1.0",
     "leaflet": "^1.0.3",
     "leaflet.markercluster": "^1.3.0"
