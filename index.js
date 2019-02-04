@@ -1,12 +1,27 @@
 'use strict';
 
-//var $ = require('jquery');
-//require('jquery-ui');
+//global.jQuery = require('jquery');
+//require('tipso');
+
+//jQuery(function(){
+//  jQuery('.title-tipso').tipso();
+//});
+
+var $  = require( 'jquery' );
+var dt = require( 'datatables.net' )( window, $ );
+
+console.log("test");
+
+$(document).ready(function() {
+    $('#example').DataTable();
+} );
 
 
+/*console.log($);
 $.jgrid = $.jgrid || {};
 $.jgrid.no_legacy_api = true;
 $.jgrid.useJSON = true;
+console.log("2");
 
     $(function () {
        "use strict";
@@ -78,7 +93,8 @@ $.jgrid.useJSON = true;
                }
 
                $self.jqGrid("editRow", rowid, { focusField: e.target });
-           },/*
+           },*/
+           /*
            ondblClickRow: function (rowid, iRow, iCol, e) {
                var $self = $(this), savedRow = $self.jqGrid("getGridParam", "savedRow");
                if (savedRow.length > 0 && savedRow[0].id !== rowid) {
@@ -86,10 +102,10 @@ $.jgrid.useJSON = true;
                }
                $self.jqGrid("editRow", rowid, { focusField: e.target });
            },*/
-           rownumbers: true,
+        /*   rownumbers: true,
            sortname: "invdate",
            sortorder: "desc",
            caption: "Demonstration the usage of focusField optoin of editRow"
        }).jqGrid("inlineNav")
        .jqGrid("gridResize");
-   });
+   });  */

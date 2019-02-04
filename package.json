@@ -1,7 +1,7 @@
 {
-  "name": "map_test2",
-  "version": "1.0.1",
-  "description": "Basic map test with browserify and gulp",
+  "name": "tabletest",
+  "version": "0.0.1",
+  "description": "Get a Excel like function working with a db",
   "main": "gulpfile.js",
   "scripts": {
     "start": "http-server -a localhost -p 8000 -c-1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/srldl/map_test.git"
+    "url": "git+https://github.com/srldl/tabletest.git"
   },
   "keywords": [
     "map",
@@ -18,24 +18,22 @@
   "author": "srldl",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/srldl/map_test2/issues"
+    "url": "https://github.com/srldl/tabletest/issues"
   },
-  "homepage": "https://github.com/srldl/map_test2#readme",
+  "homepage": "https://github.com/srldl/tabletest#readme",
   "devDependencies": {
-    "angular-simple-logger": "^0.1.4",
     "browser-sync": "^2.8.2",
     "browserify": "^11.0.1",
-    "http-server": "^0.8.0",
-    "leaflet-draw": "^0.2.3"
+    "http-server": "^0.8.0"
+  },
+  "browser": {
+    "tipso": "./node_modules/tipso/src/tipso.js",
+    "datatables.net":"./node_modules/datatables.net/js/jquery.dataTables.js"
   },
   "dependencies": {
-    "angular": "^1.4.4",
-    "angular-leaflet-directive": "^0.8.8",
-    "free-jqgrid": "^4.15.5",
+    "browserify-shim": "^3.8.14",
+    "datatables.net-dt": "^1.10.19",
     "jquery": "^3.3.1",
-    "jquery-ui": "^1.12.1",
-    "jsdom": "^13.1.0",
-    "leaflet": "^1.0.3",
-    "leaflet.markercluster": "^1.3.0"
+    "tipso": "^1.0.8"
   }
 }
