@@ -28,11 +28,15 @@
   },
   "browser": {
     "tipso": "./node_modules/tipso/src/tipso.js",
-    "datatables.net":"./node_modules/datatables.net/js/jquery.dataTables.js"
+    "datatables.net": "./node_modules/datatables.net/js/jquery.dataTables.js"
   },
   "dependencies": {
     "browserify-shim": "^3.8.14",
+    "datatables.net-autofill": "^2.3.2",
+    "datatables.net-buttons": "^1.5.4",
     "datatables.net-dt": "^1.10.19",
+    "datatables.net-editor": "^1.6.5",
+    "datatables.net-select": "^1.2.7",
     "jquery": "^3.3.1",
     "tipso": "^1.0.8"
   }
