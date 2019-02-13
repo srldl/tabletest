@@ -1,7 +1,7 @@
 'use strict';
 
 var $  = require( 'jquery' );
-var tb = require( '@srldl/edit-tabletest/js/edit-table.js');
+var editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
 //require( 'datatables.net-dt' )( window, $ );
 var dt = require( 'datatables.net' )( window, $ );
 require('datatables.net-select' )( window, $ );
@@ -9,8 +9,8 @@ require('datatables.net-select' )( window, $ );
 //var buttons = require( 'datatables.net-buttons' )( window, $ );
 //var buttons2 = require( 'datatables.net-buttons-dt' )( window, $ );
 
-tb.printMsg();
-tb.testMsg();
+editTable.printMsg();
+editTable.testMsg();
 
 //Testdata  template and fieldwork
 let template = {
@@ -54,6 +54,16 @@ let fieldwork = [{
   "label_name": "35"
 }];
 
+let new_fieldwork = {
+  "matrix":"plasma",
+  "event_date": "1996-04-07T17:01:30Z",
+  "species": "ursus maritimus",
+  "latitude": 88,
+  "longitude": 13,
+  "placename": "Bassenget",
+  "no_samples_amount": "88"
+};
+
 
 //row is each displayed row in table
 let row = [];
@@ -93,7 +103,7 @@ for (let value of template.field) {
 $(document).ready(function() {
 var table = $('#example').DataTable( {
         select: true,
-        autofill: true,
+      //  autofill: true,
         data: dataSet,
         columns: columnsArr
 });
@@ -116,10 +126,11 @@ var table = $('#example').DataTable( {
     var e4 = "8422";
     var e5 = "2011/07/25";
     var e6 = "$170,750";
+    var e7 = "";
 
     $('#addBtn').click( function() {
         console.log( e1);
-        var rowNode = table.row.add( [e1, e2, e3, e4, e5, e6] ).draw().node();
+        var rowNode = table.row.add( [e1, e2, e3, e4, e5, e6, e7] ).draw().node();
 
        $( rowNode )
        .css( 'color', 'red' )
@@ -130,18 +141,19 @@ var table = $('#example').DataTable( {
         return false;
     } );
 
-    $('#newBtn').click( function() {
-       var e1 = e3 = e4 = e5 = e6 = '<td><input type="text" name="fname"></td>';
-       var e2 = '<td><select name="car"><option value="volvo">Volvo</option><option value="saab">Saab</option></select></td>';
-        var rowNode = table.row.add( [e1, e2, e3, e4, e5, e6] ).draw().node();
+
+
+     $('#newBtn').click( function() {
+        var e1 = e3 = e4 = e5 = e6 = e7 =  editTable.createString('idfield','');
+        var e2 = editTable.createSelect(['volvo', 'saab', 'renault'], 'idfield2', '');
+        var rowNode = table.row.add( [e1, e2, e3, e4, e5, e6, e7] ).draw().node();
 
        $( rowNode )
        .css( 'color', 'red' )
        .animate( { color: 'blue' } );
-          console.log( table.data() );
 
         return false;
-    } );
+     });
 
     $('#editBtn').click( function() {
          var rowNode = table.row('.selected');
