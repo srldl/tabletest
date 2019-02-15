@@ -1,16 +1,16 @@
 'use strict';
 
-var $  = require( 'jquery' );
-var editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
+const $  = require( 'jquery' );
+const editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
 //require( 'datatables.net-dt' )( window, $ );
-var dt = require( 'datatables.net' )( window, $ );
+const dt = require( 'datatables.net' )( window, $ );
 require('datatables.net-select' )( window, $ );
 //require('datatables.net-autofill' )( window, $ );
-//var buttons = require( 'datatables.net-buttons' )( window, $ );
-//var buttons2 = require( 'datatables.net-buttons-dt' )( window, $ );
 
-editTable.printMsg();
-editTable.testMsg();
+//let pp = editTable.printMsg();
+//console.log(pp);
+
+//console.log(editTable.pq('My secret guess2'));
 
 //Testdata  template and fieldwork
 let template = {
@@ -73,7 +73,7 @@ let dataSet = [];
 let found = false;
 //Traverse fieldwork array
 for (let n=0; n<fieldwork.length; n++) {
-  //Traverse template array to ensure correct headings with values
+  //Traverse template array to ensure matching headings and values
   for (let value of template.field) {
     found = false;
     for (let m in fieldwork[n]) {
@@ -93,7 +93,6 @@ dataSet.push(row);
 row=[];
 }
 
-
 //Create table headings
 let columnsArr = [];
 for (let value of template.field) {
@@ -102,16 +101,14 @@ for (let value of template.field) {
 
 $(document).ready(function() {
 var table = $('#example').DataTable( {
-        select: true,
+        select: {
+            style: 'single'
+        },
       //  autofill: true,
         data: dataSet,
         columns: columnsArr
 });
 
-
-    //console.log(table);
-    //console.log($('#example').dataTable());
-    //console.log( table.data() );
 
     $('#saveBtn').click( function() {
       var data = table.$('input, select').serialize();
@@ -120,51 +117,66 @@ var table = $('#example').DataTable( {
         return false;
     } );
 
-    var e1 = 'Eva 2 Olsen';
-    var e2 = '<td><input type="text" value=""></td>';
-    var e3 = 'Edinburgh';
-    var e4 = "8422";
-    var e5 = "2011/07/25";
-    var e6 = "$170,750";
-    var e7 = "";
 
-    $('#addBtn').click( function() {
-        console.log( e1);
-        var rowNode = table.row.add( [e1, e2, e3, e4, e5, e6, e7] ).draw().node();
+    $('#copyBtn').click( function() {
+        var sel_row =   table.rows({ selected: true }).data();
+        //Check that a row has been selected
+        if (sel_row[0] === undefined) {
+            alert("Please select a row");
+        } else {
+            console.log(sel_row[0]);
+            var rowNode = table.row.add( sel_row[0]).draw().node();
 
-       $( rowNode )
-       .css( 'color', 'red' )
-       .animate( { color: 'blue' } );
+            $( rowNode )
+            .css( 'color', 'red' )
+            .animate( { color: 'blue' } );
 
-          console.log( table.data() );
+            console.log( table.data() );
+       }
 
         return false;
     } );
 
-
-
      $('#newBtn').click( function() {
-        var e1 = e3 = e4 = e5 = e6 = e7 =  editTable.createString('idfield','');
-        var e2 = editTable.createSelect(['volvo', 'saab', 'renault'], 'idfield2', '');
-        var rowNode = table.row.add( [e1, e2, e3, e4, e5, e6, e7] ).draw().node();
+        let arr = [];
+        for (let i=0;i<template.field.length;i++){
+           arr.push(editTable.createString(template.field[i],''))
+        };
+        var rowNode = table.row.add( [e0, e1, e2, e3, e4, e5, e6,e7] ).draw().node();
+        var rowNode = table.row.add( arr ).draw().node();
 
-       $( rowNode )
-       .css( 'color', 'red' )
-       .animate( { color: 'blue' } );
+        $( rowNode )
+        .css( 'color', 'red' )
+        .animate( { color: 'blue' } );
 
         return false;
      });
 
-    $('#editBtn').click( function() {
-         var rowNode = table.row('.selected');
-         console.log(rowNode.data());
-         var nodeArr =  rowNode.data();
-         //for (i=0;i<nodeArr.length;i++){
-        //  rowNode.remove().draw();
-          table.row('.selected').data(["3",'<td><input type="text" name="fname" value='+nodeArr[0]+'></td>', nodeArr[1],"e","e2","e3","e4"] ).draw().node();
-         //}
-        return false;
-    } );
+     $('#editBtn').click( function() {
+         var sel_row =   table.rows({ selected: true }).data();
+         let sel = [];
+         //Check that a row has been selected
+         if (sel_row[0] === undefined) {
+             alert("Please select a row");
+         } else {
+             console.log(sel_row[0]);
+
+            for (let j=0;j<template.field.length;j++){
+              let sel_row_temp = editTable.createString(template.field[j]+'0',sel_row[0][j]);
+              sel.push(sel_row_temp);
+            }
+            console.log(sel);
+             var rowNode = table.row.add( sel).draw().node();
+             var rowNode1 = table.row('.selected').remove().draw();
+
+             $( rowNode )
+             .css( 'color', 'red' )
+             .animate( { color: 'blue' } );
+
+        }
+         return false;
+     } );
+
 
     $('#delBtn').click( function() {
        console.log(table.row($(this)));
