@@ -109,40 +109,39 @@ var table = $('#example').DataTable( {
         columns: columnsArr
 });
 
+$('#saveBtn').click( function() {
+   //Fetch all data
+   let allData = table.data();
+   console.log( allData );
+   //Get number of rows created
+   console.log(table.rows()[0]);
+   return false;
+} );
 
-    $('#saveBtn').click( function() {
-      var data = table.$('input, select').serialize();
-       //console.log(data[3].value);  //.substr( 0, 120 ));
-       console.log( data);
+$('#copyBtn').click( function() {
+    var sel_row =   table.rows({ selected: true }).data();
+    //Check that a row has been selected
+    if (sel_row[0] === undefined) {
+        alert("Please select a row");
+    } else {
+        console.log(sel_row[0]);
+        let sel = editTable.active(template.field,sel_row[0]);
+
+        var rowNode = table.row.add( sel).draw().node();
+
+        $( rowNode )
+                .css( 'color', 'red' )
+                .animate( { color: 'blue' } );
+
+        }
         return false;
-    } );
-
-
-    $('#copyBtn').click( function() {
-        var sel_row =   table.rows({ selected: true }).data();
-        //Check that a row has been selected
-        if (sel_row[0] === undefined) {
-            alert("Please select a row");
-        } else {
-            console.log(sel_row[0]);
-            var rowNode = table.row.add( sel_row[0]).draw().node();
-
-            $( rowNode )
-            .css( 'color', 'red' )
-            .animate( { color: 'blue' } );
-
-            console.log( table.data() );
-       }
-
-        return false;
-    } );
+} );
 
      $('#newBtn').click( function() {
         let arr = [];
         for (let i=0;i<template.field.length;i++){
            arr.push(editTable.createString(template.field[i],''))
-        };
-        var rowNode = table.row.add( [e0, e1, e2, e3, e4, e5, e6,e7] ).draw().node();
+        }
         var rowNode = table.row.add( arr ).draw().node();
 
         $( rowNode )
@@ -153,19 +152,16 @@ var table = $('#example').DataTable( {
      });
 
      $('#editBtn').click( function() {
-         var sel_row =   table.rows({ selected: true }).data();
-         let sel = [];
+         var sel_row =   table.rows({ selected: true }).data()
+
          //Check that a row has been selected
          if (sel_row[0] === undefined) {
              alert("Please select a row");
          } else {
-             console.log(sel_row[0]);
 
-            for (let j=0;j<template.field.length;j++){
-              let sel_row_temp = editTable.createString(template.field[j]+'0',sel_row[0][j]);
-              sel.push(sel_row_temp);
-            }
-            console.log(sel);
+             console.log(sel_row[0]);
+             let sel = editTable.active(template.field,sel_row[0]);
+
              var rowNode = table.row.add( sel).draw().node();
              var rowNode1 = table.row('.selected').remove().draw();
 
