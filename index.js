@@ -36,6 +36,7 @@ let template = {
 };
 
 let fieldwork = [{
+  "id":"4568140a7f01462edc029e42ab040f01",
   "matrix":"plasma",
   "event_date": "1993-04-07T17:01:30Z",
   "species": "ursus maritimus",
@@ -45,6 +46,7 @@ let fieldwork = [{
   "no_samples_amount": "33"
 },
 {
+  "id":"4568140a7f01462edc029e42ab056e41",
   "matrix":"plasma",
   "event_date": "1999-04-07T17:01:30Z",
   "species": "ursus maritimus",
@@ -55,6 +57,7 @@ let fieldwork = [{
 }];
 
 let new_fieldwork = {
+  "id":"4568140a7f01462edc029e42ab056e567",
   "matrix":"plasma",
   "event_date": "1996-04-07T17:01:30Z",
   "species": "ursus maritimus",
@@ -71,23 +74,30 @@ let row = [];
 let dataSet = [];
 //found is toggled to ensure all rows are filled in
 let found = false;
+let id;
 //Traverse fieldwork array
 for (let n=0; n<fieldwork.length; n++) {
   //Traverse template array to ensure matching headings and values
   for (let value of template.field) {
     found = false;
+    id = '';
     for (let m in fieldwork[n]) {
            //If fieldwork object contains heading (template key)
            if (m == value) {
              //Push value into correct row/column
              row.push(fieldwork[n][m]);
              found = true;
-             //console.log(fieldwork[n][m]);
+             //Need to add ID at the end of the array
+           } else if (m == 'id') {
+              id  = fieldwork[n][m];
            }
     }
     //If the method has no value/is not included, the value is empty string
     if (found === false) {row.push("")};
 }
+//Push ID to array at the end
+row.push(id);
+
 //Push rows onto dataset, empty row array
 dataSet.push(row);
 row=[];
@@ -114,42 +124,33 @@ $('#saveBtn').click( function() {
    let allData = table.data();
    console.log( allData );
    //Get number of rows created
-   console.log(table.rows()[0]);
+  // console.log(table.rows()[0]);
    return false;
 } );
 
 $('#copyBtn').click( function() {
-    var sel_row =   table.rows({ selected: true }).data();
+
+    let sel_row =   table.rows({ selected: true }).data();
+      console.log(sel_row);
     //Check that a row has been selected
     if (sel_row[0] === undefined) {
         alert("Please select a row");
     } else {
-        console.log(sel_row[0]);
-        let sel = editTable.active(template.field,sel_row[0]);
-
+        //if sel_row has id, remove it to become a new entry
+        let cpy_row = Array.from(sel_row[0]);
+        console.log(sel_row[0].length, template);
+        if ((sel_row[0]).length > (template.field).length){ cpy_row.pop(); }
+        //Activate without ids since it is a new entry
+        let sel = editTable.active(template.field,(cpy_row));
         var rowNode = table.row.add( sel).draw().node();
 
         $( rowNode )
                 .css( 'color', 'red' )
                 .animate( { color: 'blue' } );
-
         }
         return false;
 } );
 
-     $('#newBtn').click( function() {
-        let arr = [];
-        for (let i=0;i<template.field.length;i++){
-           arr.push(editTable.createString(template.field[i],''))
-        }
-        var rowNode = table.row.add( arr ).draw().node();
-
-        $( rowNode )
-        .css( 'color', 'red' )
-        .animate( { color: 'blue' } );
-
-        return false;
-     });
 
      $('#editBtn').click( function() {
          var sel_row =   table.rows({ selected: true }).data()
@@ -172,6 +173,20 @@ $('#copyBtn').click( function() {
         }
          return false;
      } );
+
+     $('#newBtn').click( function() {
+        let arr = [];
+        for (let i=0;i<template.field.length;i++){
+           arr.push(editTable.createString(template.field[i],''))
+        }
+        var rowNode = table.row.add( arr ).draw().node();
+
+        $( rowNode )
+        .css( 'color', 'red' )
+        .animate( { color: 'blue' } );
+
+        return false;
+     });
 
 
     $('#delBtn').click( function() {
