@@ -122,23 +122,26 @@ var table = $('#example').DataTable( {
 $('#saveBtn').click( function() {
    //Fetch all data
    let allData = table.data();
-   console.log( allData );
-   //Get number of rows created
-  // console.log(table.rows()[0]);
+   //console.log( allData );
+   let ret = editTable.passive(allData,(table.rows()[0].length),(table.columns()[0].length));
+   //Delete all rows in table, Display new ones
+   table.rows().remove().draw();
+   table.rows.add(ret).draw();  
+
    return false;
 } );
 
 $('#copyBtn').click( function() {
 
     let sel_row =   table.rows({ selected: true }).data();
-      console.log(sel_row);
+      //console.log(sel_row);
     //Check that a row has been selected
     if (sel_row[0] === undefined) {
         alert("Please select a row");
     } else {
         //if sel_row has id, remove it to become a new entry
         let cpy_row = Array.from(sel_row[0]);
-        console.log(sel_row[0].length, template);
+      //  console.log(sel_row[0].length, template);
         if ((sel_row[0]).length > (template.field).length){ cpy_row.pop(); }
         //Activate without ids since it is a new entry
         let sel = editTable.active(template.field,(cpy_row));
@@ -160,7 +163,7 @@ $('#copyBtn').click( function() {
              alert("Please select a row");
          } else {
 
-             console.log(sel_row[0]);
+             //console.log(sel_row[0]);
              let sel = editTable.active(template.field,sel_row[0]);
 
              var rowNode = table.row.add( sel).draw().node();
@@ -190,9 +193,9 @@ $('#copyBtn').click( function() {
 
 
     $('#delBtn').click( function() {
-       console.log(table.row($(this)));
+       //console.log(table.row($(this)));
        var rowNode = table.row('.selected').remove().draw();
-       console.log( table.data() );
+       //console.log( table.data() );
         return false;
     } );
 } );
