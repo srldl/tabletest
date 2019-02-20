@@ -56,17 +56,6 @@ let fieldwork = [{
   "label_name": "35"
 }];
 
-let new_fieldwork = {
-  "id":"4568140a7f01462edc029e42ab056e567",
-  "matrix":"plasma",
-  "event_date": "1996-04-07T17:01:30Z",
-  "species": "ursus maritimus",
-  "latitude": 88,
-  "longitude": 13,
-  "placename": "Bassenget",
-  "no_samples_amount": "88"
-};
-
 
 //row is each displayed row in table
 let row = [];
@@ -122,11 +111,12 @@ var table = $('#example').DataTable( {
 $('#saveBtn').click( function() {
    //Fetch all data
    let allData = table.data();
-   //console.log( allData );
+
    let ret = editTable.passive(allData,(table.rows()[0].length),(table.columns()[0].length));
    //Delete all rows in table, Display new ones
    table.rows().remove().draw();
-   table.rows.add(ret).draw();  
+   table.rows.add(ret).draw();
+   console.log(table.data());
 
    return false;
 } );
@@ -134,18 +124,18 @@ $('#saveBtn').click( function() {
 $('#copyBtn').click( function() {
 
     let sel_row =   table.rows({ selected: true }).data();
-      //console.log(sel_row);
     //Check that a row has been selected
     if (sel_row[0] === undefined) {
-        alert("Please select a row");
+        alert("Please select at least one row");
     } else {
         //if sel_row has id, remove it to become a new entry
         let cpy_row = Array.from(sel_row[0]);
       //  console.log(sel_row[0].length, template);
         if ((sel_row[0]).length > (template.field).length){ cpy_row.pop(); }
         //Activate without ids since it is a new entry
-        let sel = editTable.active(template.field,(cpy_row));
-        var rowNode = table.row.add( sel).draw().node();
+        let cpy_row2 = editTable.passive([cpy_row],1,(table.columns()[0].length));
+        let sel = editTable.active(template.field,(cpy_row2[0]));
+        let rowNode = table.row.add( sel).draw().node();
 
         $( rowNode )
                 .css( 'color', 'red' )
@@ -160,14 +150,14 @@ $('#copyBtn').click( function() {
 
          //Check that a row has been selected
          if (sel_row[0] === undefined) {
-             alert("Please select a row");
+             alert("Please select at least one row");
          } else {
 
-             //console.log(sel_row[0]);
-             let sel = editTable.active(template.field,sel_row[0]);
+             let cpy_row2 = editTable.passive([sel_row[0]],1,(table.columns()[0].length));
+             let sel = editTable.active(template.field,cpy_row2[0]);
 
-             var rowNode = table.row.add( sel).draw().node();
-             var rowNode1 = table.row('.selected').remove().draw();
+             var rowNode = table.row.add(sel).draw().node();
+             table.row('.selected').remove().draw();
 
              $( rowNode )
              .css( 'color', 'red' )
