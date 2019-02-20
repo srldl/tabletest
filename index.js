@@ -92,6 +92,9 @@ dataSet.push(row);
 row=[];
 }
 
+console.log("---dataset----")
+console.log(dataSet);
+
 //Create table headings
 let columnsArr = [];
 for (let value of template.field) {
@@ -105,18 +108,26 @@ var table = $('#example').DataTable( {
         },
       //  autofill: true,
         data: dataSet,
-        columns: columnsArr
+        columns: columnsArr,
+        rowId: function(dataSet) {
+           return 'id_' + dataSet[8];
+        //   return 'id_' + fieldwork.id;
+	      }
 });
 
 $('#saveBtn').click( function() {
    //Fetch all data
    let allData = table.data();
+   console.log(allData);
+   var data = table.$('input, select').serialize();
+  // let data = table.rows({ selected: true }).serialize();
+   console.log(data);
+   console.log(table.rows().ids());
 
    let ret = editTable.passive(allData,(table.rows()[0].length),(table.columns()[0].length));
    //Delete all rows in table, Display new ones
    table.rows().remove().draw();
    table.rows.add(ret).draw();
-   console.log(table.data());
 
    return false;
 } );
