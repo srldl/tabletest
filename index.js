@@ -36,12 +36,12 @@ let template = {
 };
 
 let fieldwork = [{
-  "id":"4568140a7f01462edc029e42ab040f01",
-  "matrix":"plasma",
+  "id":"4568140a7f01462edc029e42ab040f01</p>",
+  "matrix":"hairstraw",
   "event_date": "1993-04-07T17:01:30Z",
   "species": "ursus maritimus",
-  "latitude": 77,
-  "longitude": 16,
+  "latitude": "77",
+  "longitude": "16",
   "placename": "Burgerbukta",
   "no_samples_amount": "33"
 },
@@ -92,9 +92,6 @@ dataSet.push(row);
 row=[];
 }
 
-console.log("---dataset----")
-console.log(dataSet);
-
 //Create table headings
 let columnsArr = [];
 for (let value of template.field) {
@@ -106,23 +103,49 @@ var table = $('#example').DataTable( {
         select: {
             style: 'single'
         },
-      //  autofill: true,
         data: dataSet,
         columns: columnsArr,
         rowId: function(dataSet) {
            return 'id_' + dataSet[8];
-        //   return 'id_' + fieldwork.id;
 	      }
 });
 
+//On select convert text elements to active inputs
+table.on( 'select', function () {
+  let sel_row = table.rows( { selected: true } ).data();
+  let sel = editTable.active(template.field,sel_row[0]);
+  let rowNode = table.row('.selected').data(sel).draw();
+  $( rowNode ).animate( { color: 'blue' } );
+  return false;
+} );
+
+//On deselect convert active elements to passive text
+table.on( 'deselect', function ( e, dt, type, indexes ) {
+    if ( type === 'row' ) {
+        let sel_row = table.row( indexes ).data();
+        let sel = editTable.passive(sel_row,(sel_row.length),1);
+        console.log(sel);
+        let rowNode = table.row(indexes).data(sel).draw();
+        $( rowNode ).animate( { color: 'blue' } );
+        return false
+
+    }
+} );
+
+
 $('#saveBtn').click( function() {
-   //Fetch all data
-   let allData = table.data();
-   console.log(allData);
    var data = table.$('input, select').serialize();
+
+//  console.log(table);
+//  console.log(data);
+
   // let data = table.rows({ selected: true }).serialize();
-   console.log(data);
-   console.log(table.rows().ids());
+
+   //console.log(table.rows().ids());
+
+  //Fetch all data
+   let allData = table.data();
+   //console.log(allData);
 
    let ret = editTable.passive(allData,(table.rows()[0].length),(table.columns()[0].length));
    //Delete all rows in table, Display new ones
@@ -145,38 +168,16 @@ $('#copyBtn').click( function() {
         if ((sel_row[0]).length > (template.field).length){ cpy_row.pop(); }
         //Activate without ids since it is a new entry
         let cpy_row2 = editTable.passive([cpy_row],1,(table.columns()[0].length));
-        let sel = editTable.active(template.field,(cpy_row2[0]));
-        let rowNode = table.row.add( sel).draw().node();
+        //let sel = editTable.active(template.field,(cpy_row2[0]));
+        let rowNode = table.row.add( cpy_row2[0]).draw().node();
 
         $( rowNode )
-                .css( 'color', 'red' )
+              //  .css( 'color', 'red' )
                 .animate( { color: 'blue' } );
         }
         return false;
 } );
 
-
-     $('#editBtn').click( function() {
-         var sel_row =   table.rows({ selected: true }).data()
-
-         //Check that a row has been selected
-         if (sel_row[0] === undefined) {
-             alert("Please select at least one row");
-         } else {
-
-             let cpy_row2 = editTable.passive([sel_row[0]],1,(table.columns()[0].length));
-             let sel = editTable.active(template.field,cpy_row2[0]);
-
-             var rowNode = table.row.add(sel).draw().node();
-             table.row('.selected').remove().draw();
-
-             $( rowNode )
-             .css( 'color', 'red' )
-             .animate( { color: 'blue' } );
-
-        }
-         return false;
-     } );
 
      $('#newBtn').click( function() {
         let arr = [];
@@ -184,6 +185,15 @@ $('#copyBtn').click( function() {
            arr.push(editTable.createString(template.field[i],''))
         }
         var rowNode = table.row.add( arr ).draw().node();
+
+        $('input, select').blur(function(){
+          var data = table.$('input, select').serialize();
+          // console.log(table.rows({ selected: true }).ids());
+          let sel_row =   table.rows({ selected: true }).data();
+           console.log(sel_row[0]);
+           console.log(data);
+           //table.row.add('.id_undefined').draw().node();
+        });
 
         $( rowNode )
         .css( 'color', 'red' )
@@ -193,10 +203,13 @@ $('#copyBtn').click( function() {
      });
 
 
+
     $('#delBtn').click( function() {
        //console.log(table.row($(this)));
        var rowNode = table.row('.selected').remove().draw();
        //console.log( table.data() );
         return false;
     } );
+
+
 } );
