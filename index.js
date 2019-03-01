@@ -36,7 +36,7 @@ let template = {
 };
 
 let fieldwork = [{
-  "id":"4568140a7f01462edc029e42ab040f01</p>",
+  "id":"4568140a7f01462edc029e42ab040f01",
   "matrix":"hairstraw",
   "event_date": "1993-04-07T17:01:30Z",
   "species": "ursus maritimus",
@@ -54,6 +54,16 @@ let fieldwork = [{
   "longitude": 16,
   "placename": "Ny-Ålesund",
   "label_name": "35"
+},
+{
+  "id":"4568140a7f01462edc029e42ab056e41",
+  "matrix":"plasma",
+  "event_date": "1997-12-07T17:01:30Z",
+  "species": "ursus maritimus",
+  "latitude": 72,
+  "longitude": 9,
+  "placename": "Longyearbyen",
+  "label_name": "20"
 }];
 
 
@@ -110,31 +120,78 @@ var table = $('#example').DataTable( {
 	      }
 });
 
+//let sel_row4 = table.row( { selected: true } ).data();
+let index = 0;
+
+
 //On select convert text elements to active inputs
-table.on( 'select', function () {
-  let sel_row = table.rows( { selected: true } ).data();
-  let sel = editTable.active(template.field,sel_row[0]);
+/*table.on( 'select', function () {
+  let sel_row = table.row( { selected: true } ).data();
+  index_row = table.row(  { selected: true } ).index();
+  let sel = editTable.active(template.field,sel_row);
+  console.log(sel_row);
+  console.log(index_row);
+  console.log("select");
   let rowNode = table.row('.selected').data(sel).draw();
   $( rowNode ).animate( { color: 'blue' } );
   return false;
-} );
+} ); */
+
+table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
+        index = cell.index().row;
+        var row = dt.row( cell.index().row ).node();
+
+        if ( $(row).hasClass('selected') ) {
+            // deselect
+
+              //console.log("deselect");
+        }
+        else {
+            // select
+
+              let cell = table.cell( {focused:true} ).index();
+
+              //A new row has been selected
+              if (index !== cell.row) {
+                   console.log("new row selected");
+                   //Run all through passive
+                   for (let i=0;i<fieldwork.length;i++){
+                       let desel_input = table.row( i ).data();
+                       let desel = editTable.passive(desel_input,(desel_input.length));
+                       let rowNode = table.row(i).data(desel).draw();
+                   }
+              }
+
+
+              let sel_row = table.row( index ).data();
+              let sel_row2 = editTable.passive(sel_row,(sel_row.length));
+              let sel = editTable.active(template.field, sel_row2);
+              let rowNode = table.row(index).data(sel).draw();
+              $( rowNode ).animate( { color: 'blue' } );
+        }
+    } );
 
 //On deselect convert active elements to passive text
-table.on( 'deselect', function ( e, dt, type, indexes ) {
-    if ( type === 'row' ) {
-        let sel_row = table.row( indexes ).data();
-        let sel = editTable.passive(sel_row,(sel_row.length),1);
-        console.log(sel);
-        let rowNode = table.row(indexes).data(sel).draw();
-        $( rowNode ).animate( { color: 'blue' } );
-        return false
+/*table.on( 'deselect', function ( e, dt, type, indexes ) {
+  let sel_cell = table.cell( {focused:true} ).index();
 
-    }
-} );
+  console.log(sel_cell.row);
+  console.log(index_row);
+  if (index_row !== sel_cell.row) {
+       console.log("no match");
+       let sel_row = table.row( indexes ).data();
+       let sel = editTable.passive(sel_row,(sel_row.length),1);
+       let rowNode = table.row(indexes).data(sel).draw();
+  }
+
+     console.log("deselect");
+      return false
+} );  */
 
 
 $('#saveBtn').click( function() {
    var data = table.$('input, select').serialize();
+
 
 //  console.log(table);
 //  console.log(data);
@@ -182,22 +239,13 @@ $('#copyBtn').click( function() {
      $('#newBtn').click( function() {
         let arr = [];
         for (let i=0;i<template.field.length;i++){
-           arr.push(editTable.createString(template.field[i],''))
+          // arr.push(editTable.createString(template.field[i],''))
+           arr.push('');
         }
-        var rowNode = table.row.add( arr ).draw().node();
+        let sel = table.row.add( arr ).draw().node();
+        let rowNode = table.row(sel).select();
 
-        $('input, select').blur(function(){
-          var data = table.$('input, select').serialize();
-          // console.log(table.rows({ selected: true }).ids());
-          let sel_row =   table.rows({ selected: true }).data();
-           console.log(sel_row[0]);
-           console.log(data);
-           //table.row.add('.id_undefined').draw().node();
-        });
-
-        $( rowNode )
-        .css( 'color', 'red' )
-        .animate( { color: 'blue' } );
+        $( rowNode ).animate( { color: 'blue' } );
 
         return false;
      });
