@@ -103,24 +103,50 @@ row=[];
 }
 
 //Create table headings
-let columnsArr = [];
+let columnsArr = [{ 'title': 'index' }];
 for (let value of template.field) {
   columnsArr.push({ 'title': value });
 }
 
+let table;
 $(document).ready(function() {
-var table = $('#example').DataTable( {
+  $('#table1').on( 'init.dt', function () {
+        table = $('#table1').DataTable();
+          table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+              cell.innerHTML = i+1;
+        //  table.rows().invalidate();
+          } );
+      } ).DataTable( {
+          lengthChange: true,
+          autoWidth: false,
+          scrollCollapse: false,
+          searching: true,
+          data: dataSet,
+          columns: columnsArr,
+          rowId: function(dataSet) {
+             return 'id_' + dataSet[8];
+          },
+          "order": [[ 8, 'desc' ]],
+          "ordering": true,
+          "columnDefs": [{targets: 2, type: 'formatted-num'}]
+
+      } );
+
+
+/*var table = $('#table1').DataTable( {
         select: {
             style: 'single'
         },
+        autoWidth: true,
+        lengthChange: true,
         data: dataSet,
         columns: columnsArr,
         rowId: function(dataSet) {
            return 'id_' + dataSet[8];
 	      }
-});
+}); */
 
-//let sel_row4 = table.row( { selected: true } ).data();
+
 let index = 0;
 
 
@@ -247,26 +273,33 @@ var get_rows = () => {
     }
 }
 
+//Count current index
+var get_index = () => {
+  return (table.rows().data().length)+1;
+}
 
 $('#newBtn').click( function() {
         let sel;
         let num_rows = get_rows();
         let arr;
 
-        //if num_rows
-        for (let j=0;j<(num_rows-1);j++){
-          arr = [];
+        //Get number of rows
+        let  index_counter = get_index();
+
+        for (let j=0;j<(num_rows);j++){
+          arr = [index_counter];
+
           template.field.forEach(function (i){
              arr.push('');
           });
 
           sel = table.row.add( arr ).draw().node();
-
+          index_counter++;
         };
 
-        let sel_arr = editTable.active(template.field, arr);
-        sel = table.row.add( sel_arr ).draw().node();
-        let rowNode = table.row( sel ).select();
+        //Make the last entry active
+        let desel = editTable.active(template.field+1, arr);
+        let rowNode = table.row(sel).data(desel).draw().select();
         $( rowNode ).animate( { color: 'blue' } );
 
         return false;
