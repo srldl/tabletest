@@ -235,16 +235,38 @@ $('#copyBtn').click( function() {
         return false;
 } );
 
+//Get the number of new or copied row we want
+//If null, return 1 for one row added
+var get_rows = () => {
+    let num_input = document.getElementById('addRows').value;
+    let num_rows = num_input.match(/[0-9]/g);
+    if (num_rows !== null){
+      return num_rows[0];
+    } else {
+      return 1;
+    }
+}
 
-     $('#newBtn').click( function() {
-        let arr = [];
-        for (let i=0;i<template.field.length;i++){
-          // arr.push(editTable.createString(template.field[i],''))
-           arr.push('');
-        }
-        let sel = table.row.add( arr ).draw().node();
-        let rowNode = table.row(sel).select();
 
+$('#newBtn').click( function() {
+        let sel;
+        let num_rows = get_rows();
+        let arr;
+
+        //if num_rows
+        for (let j=0;j<(num_rows-1);j++){
+          arr = [];
+          template.field.forEach(function (i){
+             arr.push('');
+          });
+
+          sel = table.row.add( arr ).draw().node();
+
+        };
+
+        let sel_arr = editTable.active(template.field, arr);
+        sel = table.row.add( sel_arr ).draw().node();
+        let rowNode = table.row( sel ).select();
         $( rowNode ).animate( { color: 'blue' } );
 
         return false;
