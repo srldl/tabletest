@@ -68,7 +68,8 @@ let fieldwork = [{
 
 
 //row is each displayed row in table
-let row = [];
+let index_count = 1;
+let row = [index_count++];
 //dataSet is all rows displayed in a two dimensional array.
 let dataSet = [];
 //found is toggled to ensure all rows are filled in
@@ -99,7 +100,7 @@ row.push(id);
 
 //Push rows onto dataset, empty row array
 dataSet.push(row);
-row=[];
+row=[index_count++];
 }
 
 //Create table headings
@@ -112,21 +113,22 @@ let table;
 $(document).ready(function() {
   $('#table1').on( 'init.dt', function () {
         table = $('#table1').DataTable();
-          table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-              cell.innerHTML = i+1;
+      //    table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+        //      cell.innerHTML = i+1;
         //  table.rows().invalidate();
-          } );
+        //  } );
       } ).DataTable( {
-          lengthChange: true,
-          autoWidth: false,
-          scrollCollapse: false,
-          searching: true,
+        //  lengthChange: true,
+        //  autoWidth: false,
+        //  scrollCollapse: false,
+        //  searching: true,
+          select:'single',
           data: dataSet,
           columns: columnsArr,
           rowId: function(dataSet) {
              return 'id_' + dataSet[8];
-          },
-          "order": [[ 8, 'desc' ]],
+          } ,
+        //  "order": [[ 8, 'desc' ]],
           "ordering": true,
           "columnDefs": [{targets: 2, type: 'formatted-num'}]
 
@@ -174,24 +176,22 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
         }
         else {
             // select
-
-              let cell = table.cell( {focused:true} ).index();
+            let cell = table.cell( {focused:true} ).index();
 
               //A new row has been selected
               if (index !== cell.row) {
                    console.log("new row selected");
                    //Run all through passive
-                   for (let i=0;i<fieldwork.length;i++){
+                   for (let i=0;i<(fieldwork.length);i++){
                        let desel_input = table.row( i ).data();
                        let desel = editTable.passive(desel_input,(desel_input.length));
                        let rowNode = table.row(i).data(desel).draw();
                    }
               }
 
-
               let sel_row = table.row( index ).data();
               let sel_row2 = editTable.passive(sel_row,(sel_row.length));
-              let sel = editTable.active(template.field, sel_row2);
+              let sel = editTable.active(template.field+1, sel_row2);
               let rowNode = table.row(index).data(sel).draw();
               $( rowNode ).animate( { color: 'blue' } );
         }
@@ -300,6 +300,7 @@ $('#newBtn').click( function() {
         //Make the last entry active
         let desel = editTable.active(template.field+1, arr);
         let rowNode = table.row(sel).data(desel).draw().select();
+        console.log(desel);
         $( rowNode ).animate( { color: 'blue' } );
 
         return false;
