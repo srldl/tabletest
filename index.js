@@ -168,6 +168,8 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
             // deselect
 
               console.log("deselect");
+              return false;
+
         }
         else {
             // select
@@ -188,8 +190,10 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
               let sel = editTable.active(template.field+1, sel_row2);
               let rowNode = table.row(index).data(sel).draw();
               $( rowNode ).animate( { color: 'blue' } );
+              return true;
         }
-    } );
+
+    });
 
 //On deselect convert active elements to passive text
 /*table.on( 'deselect', function ( e, dt, type, indexes ) {
