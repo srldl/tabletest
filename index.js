@@ -25,45 +25,40 @@ let template = {
   ],
   "field": [
     "matrix",
-    "event_date",
-    "latitude",
-    "longitude",
-    "placename",
+    "project",
     "species",
-    "no_samples_amount",
-    "label_name"
+    "species_identification",
+    "label_name",
+    "comment"
   ]
 };
 
 let fieldwork = [{
   "id":"4568140a7f01462edc029e42ab040f01",
-  "matrix":"hairstraw",
-  "event_date": "1993-04-07T17:01:30Z",
-  "species": "ursus maritimus",
-  "latitude": "77",
-  "longitude": "16",
-  "placename": "Burgerbukta",
-  "no_samples_amount": "33"
+  "matrix":"feather",
+  "project": "Kongsfjorden northern fulmar",
+  "species": "fulmarus glacialis",
+  "species_identification": "77",
+  "label_name": "6745232",
+  "comment": "Found dead"
 },
 {
   "id":"4568140a7f01462edc029e42ab056e41",
-  "matrix":"plasma",
-  "event_date": "1999-04-07T17:01:30Z",
-  "species": "ursus maritimus",
-  "latitude": 77,
-  "longitude": 16,
-  "placename": "Ny-Ålesund",
-  "label_name": "35"
+  "matrix":"feather",
+  "project": "Kongsfjorden northern fulmar",
+  "species": "fulmarus glacialis",
+  "species_identification": "78",
+  "label_name": "6745211",
+  "comment": "Juvenile"
 },
 {
   "id":"4568140a7f01462edc029e42ab056e41",
-  "matrix":"plasma",
-  "event_date": "1997-12-07T17:01:30Z",
-  "species": "ursus maritimus",
-  "latitude": 72,
-  "longitude": 9,
-  "placename": "Longyearbyen",
-  "label_name": "20"
+  "matrix":"egg",
+  "project": "Kongsfjorden northern fulmar",
+  "species": "fulmarus glacialis",
+  "species_identification": "79",
+  "label_name": "4566432",
+  "comment": ""
 }];
 
 
@@ -172,7 +167,7 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
         if ( $(row).hasClass('selected') ) {
             // deselect
 
-              //console.log("deselect");
+              console.log("deselect");
         }
         else {
             // select
@@ -236,8 +231,6 @@ $('#saveBtn').click( function() {
 $('#copyBtn').click( function() {
 
     let sel_row =   table.row({ selected: true }).data();
-  //    let sel_row = table.row( index ).data();
-      console.log(sel_row);
 
     //Check that a row has been selected
     if (sel_row === undefined) {
@@ -288,7 +281,6 @@ var get_index = () => {
 $('#newBtn').click( function() {
         let sel;
         let num_rows = get_rows();
-        console.log(num_rows);
         let arr;
 
         //Get number of rows
@@ -316,7 +308,13 @@ $('#newBtn').click( function() {
      });
 
     $('#delBtn').click( function() {
+      let sel_row = table.row({ selected: true });
+      //Check that a row has been selected
+      if (sel_row[0].length === 0) {
+          alert("Please select at least one row");
+      } else {
        var rowNode = table.row('.selected').remove().draw();
+      }
        return false;
     } );
 
