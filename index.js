@@ -180,7 +180,6 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
 
               //A new row has been selected
               if (index !== cell.row) {
-                   console.log("new row selected");
                    //Run all through passive
                    for (let i=0;i<(fieldwork.length);i++){
                        let desel_input = table.row( i ).data();
@@ -201,8 +200,6 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
 /*table.on( 'deselect', function ( e, dt, type, indexes ) {
   let sel_cell = table.cell( {focused:true} ).index();
 
-  console.log(sel_cell.row);
-  console.log(index_row);
   if (index_row !== sel_cell.row) {
        console.log("no match");
        let sel_row = table.row( indexes ).data();
@@ -228,34 +225,44 @@ $('#saveBtn').click( function() {
 
   //Fetch all data
    let allData = table.data();
-   //console.log(allData);
 
    let ret = editTable.passive(allData,(table.rows()[0].length),(table.columns()[0].length));
    //Delete all rows in table, Display new ones
    table.rows().remove().draw();
    table.rows.add(ret).draw();
-
    return false;
 } );
 
 $('#copyBtn').click( function() {
 
-    let sel_row =   table.rows({ selected: true }).data();
+    let sel_row =   table.row({ selected: true }).data();
+  //    let sel_row = table.row( index ).data();
+      console.log(sel_row);
+
     //Check that a row has been selected
-    if (sel_row[0] === undefined) {
+    if (sel_row === undefined) {
         alert("Please select at least one row");
     } else {
-        //if sel_row has id, remove it to become a new entry
-        let cpy_row = Array.from(sel_row[0]);
-      //  console.log(sel_row[0].length, template);
-        if ((sel_row[0]).length > (template.field).length){ cpy_row.pop(); }
-        //Activate without ids since it is a new entry
-        let cpy_row2 = editTable.passive([cpy_row],1,(table.columns()[0].length));
-        //let sel = editTable.active(template.field,(cpy_row2[0]));
-        let rowNode = table.row.add( cpy_row2[0]).draw().node();
+        //If sel_row has id, remove it to become a new entry
+        let cpy_row = (sel_row.slice(1,((template.field).length+1)));
+
+        //Activate without ids since this is a new entry
+        let cpy_row2 = editTable.passive(cpy_row,((template.field).length));
+        //Get number of rows
+        let  index_counter = get_index();
+        let num_rows = get_rows();
+        let rowNode;
+
+        //Loop through to include the demanded copies
+        for (let j=0;j<(num_rows);j++){
+           //Make a deep copy
+           let cpy_row3 = [].concat(cpy_row2);
+           //Update index_counter
+           cpy_row3.splice(0,0,(index_counter++).toString());
+           rowNode = table.row.add(cpy_row3).draw().node();
+        };
 
         $( rowNode )
-              //  .css( 'color', 'red' )
                 .animate( { color: 'blue' } );
         }
         return false;
@@ -265,7 +272,7 @@ $('#copyBtn').click( function() {
 //If null, return 1 for one row added
 var get_rows = () => {
     let num_input = document.getElementById('addRows').value;
-    let num_rows = num_input.match(/[0-9]/g);
+    let num_rows = num_input.match(/[0-9]+/);
     if (num_rows !== null){
       return num_rows[0];
     } else {
@@ -281,38 +288,36 @@ var get_index = () => {
 $('#newBtn').click( function() {
         let sel;
         let num_rows = get_rows();
+        console.log(num_rows);
         let arr;
 
         //Get number of rows
         let  index_counter = get_index();
 
         for (let j=0;j<(num_rows);j++){
-          arr = [index_counter];
+          arr = [index_counter++];
 
           template.field.forEach(function (i){
              arr.push('');
           });
 
+    /*      if (j===0){
+            let desel = editTable.active(template.field+1, arr);
+            let rowNode = table.row(sel).data(desel).draw().select();
+          }
+    */
+
           sel = table.row.add( arr ).draw().node();
-          index_counter++;
         };
 
         //Make the last entry active
-        let desel = editTable.active(template.field+1, arr);
-        let rowNode = table.row(sel).data(desel).draw().select();
-        console.log(desel);
-        $( rowNode ).animate( { color: 'blue' } );
-
+      //  $( rowNode ).animate( { color: 'blue' } );
         return false;
      });
 
-
-
     $('#delBtn').click( function() {
-       //console.log(table.row($(this)));
        var rowNode = table.row('.selected').remove().draw();
-       //console.log( table.data() );
-        return false;
+       return false;
     } );
 
 
