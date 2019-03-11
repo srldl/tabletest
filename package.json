@@ -33,7 +33,7 @@
   "dependencies": {
     "@srldl/edit-tabletest": "^1.0.1",
     "browserify-shim": "^3.8.14",
-    "datatables.net-autofill": "^2.3.2",
+    "datatables.net-autofill": "^2.3.3",
     "datatables.net-buttons": "^1.5.4",
     "datatables.net-dt": "^1.10.19",
     "datatables.net-select": "^1.2.7",

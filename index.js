@@ -5,24 +5,13 @@ const editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
 //require( 'datatables.net-dt' )( window, $ );
 const dt = require( 'datatables.net' )( window, $ );
 require('datatables.net-select' )( window, $ );
-//require('datatables.net-autofill' )( window, $ );
-
-//let pp = editTable.printMsg();
-//console.log(pp);
-
-//console.log(editTable.pq('My secret guess2'));
+require('datatables.net-autofill')( window, $ );
 
 //Testdata  template and fieldwork
 let template = {
   "_id": "a11a7305-45a8-4ad2-80d9-60f4b8980cc3",
   "_rev": "8-99e39377c38e48d48b400c1e031b8a94",
   "title": "Xxxdet var en gang",
-  "base": [
-    "project",
-    "parent_event_id",
-    "ris_id",
-    "rightsholder"
-  ],
   "field": [
     "matrix",
     "project",
@@ -94,6 +83,9 @@ for (let n=0; n<fieldwork.length; n++) {
 row.push(id);
 
 //Push rows onto dataset, empty row array
+for (let i=0; i< row.length; i++){
+   row[i] = '<span contenteditable="true">' + row[i] + '</span>';
+};
 dataSet.push(row);
 row=[index_count++];
 }
@@ -108,127 +100,57 @@ let table;
 $(document).ready(function() {
   $('#table1').on( 'init.dt', function () {
         table = $('#table1').DataTable();
-      //    table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-        //      cell.innerHTML = i+1;
-        //  table.rows().invalidate();
-        //  } );
       } ).DataTable( {
-        //  lengthChange: true,
-        //  autoWidth: false,
-        //  scrollCollapse: false,
-        //  searching: true,
+          autofill: true,
           select:'single',
           data: dataSet,
+          stateSave: true,
+          stateSaveCallback: function(settings,data) {
+     localStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+   },
+ stateLoadCallback: function(settings) {
+   return JSON.parse( localStorage.getItem( 'DataTables_' + settings.sInstance ) )
+ },
           columns: columnsArr,
           rowId: function(dataSet) {
              return 'id_' + dataSet[8];
-          } ,
+          },
         //  "order": [[ 8, 'desc' ]],
           "ordering": true,
           "columnDefs": [{targets: 2, type: 'formatted-num'}]
 
       } );
 
-
-/*var table = $('#table1').DataTable( {
-        select: {
-            style: 'single'
-        },
-        autoWidth: true,
-        lengthChange: true,
-        data: dataSet,
-        columns: columnsArr,
-        rowId: function(dataSet) {
-           return 'id_' + dataSet[8];
-	      }
-}); */
-
-
 let index = 0;
-
-
-//On select convert text elements to active inputs
-/*table.on( 'select', function () {
-  let sel_row = table.row( { selected: true } ).data();
-  index_row = table.row(  { selected: true } ).index();
-  let sel = editTable.active(template.field,sel_row);
-  console.log(sel_row);
-  console.log(index_row);
-  console.log("select");
-  let rowNode = table.row('.selected').data(sel).draw();
-  $( rowNode ).animate( { color: 'blue' } );
-  return false;
-} ); */
+let old_index = 0;
 
 table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
+        //Get the new and the old index
+        old_index = index;
         index = cell.index().row;
+
+        //Get row
         var row = dt.row( cell.index().row ).node();
-
         if ( $(row).hasClass('selected') ) {
-            // deselect
 
+              // deselect
               console.log("deselect");
               return false;
 
-        }
-        else {
-            // select
-            let cell = table.cell( {focused:true} ).index();
-
-              //A new row has been selected
-              if (index !== cell.row) {
-                   //Run all through passive
-                   for (let i=0;i<(fieldwork.length);i++){
-                       let desel_input = table.row( i ).data();
-                       let desel = editTable.passive(desel_input,(desel_input.length));
-                       let rowNode = table.row(i).data(desel).draw();
-                   }
-              }
-
-              let sel_row = table.row( index ).data();
-              let sel_row2 = editTable.passive(sel_row,(sel_row.length));
-              let sel = editTable.active(template.field+1, sel_row2);
-              let rowNode = table.row(index).data(sel).draw();
-              $( rowNode ).animate( { color: 'blue' } );
-              return true;
+        } else {
+           //Get new values
+           let row_content = dt.row( old_index ).node().innerHTML;
+           //Split string into array
+           let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
+           //Draw array
+           let rowNode = table.row(old_index).data(row_content2).draw();
         }
 
     });
 
-//On deselect convert active elements to passive text
-/*table.on( 'deselect', function ( e, dt, type, indexes ) {
-  let sel_cell = table.cell( {focused:true} ).index();
-
-  if (index_row !== sel_cell.row) {
-       console.log("no match");
-       let sel_row = table.row( indexes ).data();
-       let sel = editTable.passive(sel_row,(sel_row.length),1);
-       let rowNode = table.row(indexes).data(sel).draw();
-  }
-
-     console.log("deselect");
-      return false
-} );  */
-
-
 $('#saveBtn').click( function() {
-   var data = table.$('input, select').serialize();
-
-
-//  console.log(table);
-//  console.log(data);
-
-  // let data = table.rows({ selected: true }).serialize();
-
-   //console.log(table.rows().ids());
-
-  //Fetch all data
-   let allData = table.data();
-
-   let ret = editTable.passive(allData,(table.rows()[0].length),(table.columns()[0].length));
-   //Delete all rows in table, Display new ones
-   table.rows().remove().draw();
-   table.rows.add(ret).draw();
+   var data = table.data();
+   console.log(data);
    return false;
 } );
 
