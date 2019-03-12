@@ -1,12 +1,13 @@
 'use strict';
 
 const $  = require( 'jquery' );
-const editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
+//const editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
 //require( 'datatables.net-dt' )( window, $ );
 const dt = require( 'datatables.net' )( window, $ );
 require('datatables.net-select' )( window, $ );
-require( 'datatables.net-keytable' )( window, $ );
 require('datatables.net-autofill')( window, $ );
+require( 'datatables.net-keytable' )( window, $ );
+
 
 //Testdata  template and fieldwork
 let template = {
@@ -97,30 +98,31 @@ for (let value of template.field) {
   columnsArr.push({ 'title': value });
 }
 
+
+
 let table;
 $(document).ready(function() {
   $('#table1').on( 'init.dt', function () {
         table = $('#table1').DataTable();
       } ).DataTable( {
-          autofill: true,
-          select:'single',
-          data: dataSet,
-          stateSave: true,
-          stateSaveCallback: function(settings,data) {
-     localStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
-   },
- stateLoadCallback: function(settings) {
-   return JSON.parse( localStorage.getItem( 'DataTables_' + settings.sInstance ) )
- },
-          columns: columnsArr,
-          rowId: function(dataSet) {
-             return 'id_' + dataSet[8];
-          },
-        //  "order": [[ 8, 'desc' ]],
-          "ordering": true,
-          "columnDefs": [{targets: 2, type: 'formatted-num'}]
 
-      } );
+//let table = $(document).ready(function() {
+//    $('#table1').DataTable({
+      stateSave: true,
+        data: dataSet,
+        columns: columnsArr,
+      keys: true,
+      autoFill: {
+        columns: ':not(:last-child)'
+    },
+        select:'single',
+        rowId: function(dataSet) {
+           return 'id_' + dataSet[8];
+        },
+        "ordering": true,
+        "columnDefs": [{targets: 2, type: 'formatted-num'}]
+    } );
+//} );
 
 let index = 0;
 let old_index = 0;
@@ -144,10 +146,12 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
            //Split string into array
            let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
            //Draw array
-           let rowNode = table.row(old_index).data(row_content2).draw();
+      //     let rowNode = table.row(old_index).data(row_content2).draw();
         }
 
     });
+
+
 
 $('#saveBtn').click( function() {
    var data = table.data();
@@ -228,6 +232,7 @@ $('#newBtn').click( function() {
      });
 
     $('#delBtn').click( function() {
+      console.log("delete");
       let sel_row = table.row({ selected: true });
       //Check that a row has been selected
       if (sel_row[0].length === 0) {
@@ -239,4 +244,4 @@ $('#newBtn').click( function() {
     } );
 
 
-} );
+  });
