@@ -5,6 +5,7 @@ const editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
 //require( 'datatables.net-dt' )( window, $ );
 const dt = require( 'datatables.net' )( window, $ );
 require('datatables.net-select' )( window, $ );
+require( 'datatables.net-keytable' )( window, $ );
 require('datatables.net-autofill')( window, $ );
 
 //Testdata  template and fieldwork
@@ -84,7 +85,7 @@ row.push(id);
 
 //Push rows onto dataset, empty row array
 for (let i=0; i< row.length; i++){
-   row[i] = '<span contenteditable="true">' + row[i] + '</span>';
+   row[i] = '<div contenteditable="true" style="color:black;background-color:white">' + row[i] + '</div>'
 };
 dataSet.push(row);
 row=[index_count++];
@@ -156,17 +157,16 @@ $('#saveBtn').click( function() {
 
 $('#copyBtn').click( function() {
 
-    let sel_row =   table.row({ selected: true }).data();
-
-    //Check that a row has been selected
-    if (sel_row === undefined) {
+    //Get updated text
+    if (!table.row({ selected: true }).node()) {
         alert("Please select at least one row");
     } else {
-        //If sel_row has id, remove it to become a new entry
-        let cpy_row = (sel_row.slice(1,((template.field).length+1)));
+        let sel_row =   table.row({ selected: true }).node().innerHTML;
+        //Split string into array
+        let cpy_row = sel_row.replace(/<\/td>/g,"</td>,").split(",");
+          //If sel_row has id, remove it to become a new entry
+        let cpy_row2 = (cpy_row.slice(1,((template.field).length+1)));
 
-        //Activate without ids since this is a new entry
-        let cpy_row2 = editTable.passive(cpy_row,((template.field).length));
         //Get number of rows
         let  index_counter = get_index();
         let num_rows = get_rows();
@@ -216,14 +216,8 @@ $('#newBtn').click( function() {
           arr = [index_counter++];
 
           template.field.forEach(function (i){
-             arr.push('');
+             arr.push('<div contenteditable="true" style="color:black;background-color:white">&nbsp;</div>');
           });
-
-    /*      if (j===0){
-            let desel = editTable.active(template.field+1, arr);
-            let rowNode = table.row(sel).data(desel).draw().select();
-          }
-    */
 
           sel = table.row.add( arr ).draw().node();
         };
