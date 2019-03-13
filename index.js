@@ -162,7 +162,9 @@ var update_last_row = (dt, old_index) => {
   //Split string into array
   let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
   //Draw array
-  let rowNode = table.row(old_index).data(row_content2).draw();
+  let rowNode = table.row(old_index).data(row_content2).draw(false);
+    //table.state.save();
+  //table.state.loaded();
 }
 
 
