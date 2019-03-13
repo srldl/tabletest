@@ -143,19 +143,33 @@ table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
               return false;
 
         } else {
+           console.log(dt);
+           update_last_row(dt, old_index);
            //Get new values
-           let row_content = dt.row( old_index ).node().innerHTML;
+           //let row_content = dt.row( old_index ).node().innerHTML;
            //Split string into array
-           let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
+           //let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
            //Draw array
-      //     let rowNode = table.row(old_index).data(row_content2).draw();
+           //let rowNode = table.row(old_index).data(row_content2).draw();
         }
 
     });
 
+//Update the last row edited
+var update_last_row = (dt, old_index) => {
+  //Get new values
+  let row_content = dt.row( old_index ).node().innerHTML;
+  //Split string into array
+  let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
+  //Draw array
+  let rowNode = table.row(old_index).data(row_content2).draw();
+}
+
 
 
 $('#saveBtn').click( function() {
+   let sel_row = table.row({ selected: true });
+   update_last_row(sel_row, index);
    var data = table.data();
    console.log(data);
    return false;
@@ -167,6 +181,11 @@ $('#copyBtn').click( function() {
     if (!table.row({ selected: true }).node()) {
         alert("Please select at least one row");
     } else {
+        //First update row if the user have edited before
+        let sel_row2 = table.row({ selected: true });
+        update_last_row(sel_row2, index);
+
+        //Get hold of the content
         let sel_row =   table.row({ selected: true }).node().innerHTML;
         //Split string into array
         let cpy_row = sel_row.replace(/<\/td>/g,"</td>,").split(",");
@@ -213,6 +232,8 @@ var get_index = () => {
   let row_with_index = table.column(0).data()[last_index-1];
   return parseInt(row_with_index)+1;
 }
+
+
 
 $('#newBtn').click( function() {
         let sel;
