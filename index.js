@@ -87,7 +87,7 @@ row.push(id);
 //Push rows onto dataset, empty row array
 //First column is the listed index which should not be editable.
 for (let i=1; i< row.length; i++){
-   if (row[i] == '') { row[i] = '&nbsp;' }  
+   if (row[i] == '') { row[i] = '&nbsp;' }
    row[i] = '<div contenteditable="true" style="color:black;background-color:white">' + row[i] + '</div>'
 };
 dataSet.push(row);
@@ -197,6 +197,8 @@ $('#copyBtn').click( function() {
 //If null, return 1 for one row added
 var get_rows = () => {
     let num_input = document.getElementById('addRows').value;
+    //Set value back to empty
+    document.getElementById('addRows').value = '';
     let num_rows = num_input.match(/[0-9]+/);
     if (num_rows !== null){
       return num_rows[0];
