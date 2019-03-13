@@ -85,7 +85,8 @@ for (let n=0; n<fieldwork.length; n++) {
 row.push(id);
 
 //Push rows onto dataset, empty row array
-for (let i=0; i< row.length; i++){
+//First column is the listed index which should not be editable.
+for (let i=1; i< row.length; i++){
    row[i] = '<div contenteditable="true" style="color:black;background-color:white">' + row[i] + '</div>'
 };
 dataSet.push(row);
@@ -203,9 +204,11 @@ var get_rows = () => {
     }
 }
 
-//Count current index
+//Get index from the last row
 var get_index = () => {
-  return (table.rows().data().length)+1;
+  let last_index = (table.rows().data().length);
+  let row_with_index = table.column(0).data()[last_index-1];
+  return parseInt(row_with_index)+1;
 }
 
 $('#newBtn').click( function() {
@@ -232,7 +235,6 @@ $('#newBtn').click( function() {
      });
 
     $('#delBtn').click( function() {
-      console.log("delete");
       let sel_row = table.row({ selected: true });
       //Check that a row has been selected
       if (sel_row[0].length === 0) {
