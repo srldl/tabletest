@@ -13,7 +13,7 @@ require( 'datatables.net-keytable' )( window, $ );
 let template = {
   "_id": "a11a7305-45a8-4ad2-80d9-60f4b8980cc3",
   "_rev": "8-99e39377c38e48d48b400c1e031b8a94",
-  "title": "Xxxdet var en gang",
+  "title": "Det var en gang",
   "field": [
     "matrix",
     "project",
@@ -87,6 +87,7 @@ row.push(id);
 //Push rows onto dataset, empty row array
 //First column is the listed index which should not be editable.
 for (let i=1; i< row.length; i++){
+   if (row[i] == '') { row[i] = '&nbsp;' }  
    row[i] = '<div contenteditable="true" style="color:black;background-color:white">' + row[i] + '</div>'
 };
 dataSet.push(row);
@@ -243,7 +244,7 @@ $('#newBtn').click( function() {
        var rowNode = table.row('.selected').remove().draw();
       }
        return false;
-    } );
+    });
 
 
   });
