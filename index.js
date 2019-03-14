@@ -79,14 +79,15 @@ for (let n=0; n<fieldwork.length; n++) {
            }
     }
     //If the method has no value/is not included, the value is empty string
-    if (found === false) {row.push("")};
+    if (found === false) {row.push('')};
 }
 //Push ID to array at the end
 row.push(id);
 
 //Push rows onto dataset, empty row array
-//First column is the listed index which should not be editable.
+//First column is the listed index which should not be editable, hence skipped.
 for (let i=1; i< row.length; i++){
+   //If empty row, add a space so it can be accessed.
    if (row[i] == '') { row[i] = '&nbsp;' }
    row[i] = '<div contenteditable="true" style="color:black;background-color:white">' + row[i] + '</div>'
 };
@@ -108,8 +109,6 @@ $(document).ready(function() {
         table = $('#table1').DataTable();
       } ).DataTable( {
 
-//let table = $(document).ready(function() {
-//    $('#table1').DataTable({
       stateSave: true,
         data: dataSet,
         columns: columnsArr,
@@ -122,9 +121,15 @@ $(document).ready(function() {
            return 'id_' + dataSet[8];
         },
         "ordering": true,
-        "columnDefs": [{targets: 2, type: 'formatted-num'}]
+      //  "columnDefs": [{targets: 2, type: 'formatted-num'}]
     } );
-//} );
+
+    //Provide index
+    table.on( 'order.dt search.dt', function () {
+           table.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
+               cell.innerHTML = i+1;
+           } );
+       } ).draw();
 
 let index = 0;
 let old_index = 0;
@@ -204,7 +209,8 @@ $('#copyBtn').click( function() {
            //Make a deep copy
            let cpy_row3 = [].concat(cpy_row2);
            //Update index_counter
-           cpy_row3.splice(0,0,(index_counter++).toString());
+          // cpy_row3.splice(0,0,(index_counter++).toString());
+            cpy_row3.splice(0,0,(index_counter++));
            rowNode = table.row.add(cpy_row3).draw().node();
         };
 
@@ -247,6 +253,7 @@ $('#newBtn').click( function() {
 
         for (let j=0;j<(num_rows);j++){
           arr = [index_counter++];
+          
 
           template.field.forEach(function (i){
              arr.push('<div contenteditable="true" style="color:black;background-color:white">&nbsp;</div>');
