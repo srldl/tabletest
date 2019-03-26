@@ -175,14 +175,21 @@ for (let j of fieldwork) {
 
       //Update the last row edited
       var implement_select_menu = (id) => {
-        console.log(id);
+
         let id_jq = "#"+id;
         var parent = $(id_jq).parent();
+        let text =   $(id_jq).text();
+         console.log(text);
 
             var returnstring = '';
             let arr = ['feather','egg', 'liver'];
+
             for (var i in arr) {
+                  if (arr[i] === text) {
+                    returnstring += "<option value='" + arr[i] + "'selected>" + arr[i] + "</option>";
+                  } else {
                     returnstring += "<option value='" + arr[i] + "'>" + arr[i] + "</option>";
+                  }
          }
       //   $(id_jq).append("uuu");
          console.log($(id_jq)[0].innerHTML);
