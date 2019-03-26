@@ -133,6 +133,7 @@ for (let j of fieldwork) {
            }
        }
 
+
        let index = 0;
        let old_index = 0;
        table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
@@ -149,9 +150,24 @@ for (let j of fieldwork) {
                if ( $(row).hasClass('selected') ) {
                      //deselect
                      console.log("deselect");
-                    //  return false;
+
+
+
+                      return false;
                } else {
-                  //console.log(dt);
+                  //Remove select and set the value
+                //  remove_select_menu();
+                  if (document.getElementById("sel")) {
+                     let e = document.getElementById("sel");
+                     let td_parent = document.getElementById("sel").parentNode.parentNode;
+                     let val = e.options[e.selectedIndex].value;
+                     td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
+
+                    console.log(document.getElementById("sel").parentNode.parentNode.id);
+                    console.log(e.options[e.selectedIndex].value);
+
+                  }
+
                   update_last_row(dt, old_index);
                }
               // return false;
@@ -162,15 +178,19 @@ for (let j of fieldwork) {
       //Update the last row edited
       var implement_select_menu = (id) => {
         console.log(id);
-        id = "#"+id;
-        var parent = $(id).parent();
+        let id_jq = "#"+id;
+        var parent = $(id_jq).parent();
 
             var returnstring = '';
             let arr = ['feather','egg', 'liver'];
             for (var i in arr) {
                     returnstring += "<option value='" + arr[i] + "'>" + arr[i] + "</option>";
          }
-         $(id).replaceWith("<td id='test'><div><select>" + returnstring + "</select></div></td>");
+      //   $(id_jq).append("uuu");
+         console.log($(id_jq)[0].innerHTML);
+
+           $(id_jq)[0].innerHTML = '<div id="species_identification_0"><select id="sel" class="target">' + returnstring + '</select></div>';
+      //   $(id_jq).replaceWith("<td id='"+id+"' class='focus'><div><select>" + returnstring + "</select></div></td>");
       //   $(id).replaceWith("<td id='test'><div contenteditable=\"true\"><select>" + returnstring + "</select></div></td>");
          //Remove select from where
       }
@@ -236,6 +256,7 @@ for (let j of fieldwork) {
           //table.cells().nodes()[2]['_DT_CellIndex'];
 
           update_last_row(sel_row, sel_row.index);
+
 
 
           //console.log(table.cell({ selected: true }))
