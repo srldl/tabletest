@@ -150,30 +150,28 @@ for (let j of fieldwork) {
                if ( $(row).hasClass('selected') ) {
                      //deselect
                      console.log("deselect");
-
-
-
-                      return false;
+                     return false;
                } else {
-                  //Remove select and set the value
-                //  remove_select_menu();
-                  if (document.getElementById("sel")) {
-                     let e = document.getElementById("sel");
-                     let td_parent = document.getElementById("sel").parentNode.parentNode;
-                     let val = e.options[e.selectedIndex].value;
-                     td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
 
-                    console.log(document.getElementById("sel").parentNode.parentNode.id);
-                    console.log(e.options[e.selectedIndex].value);
-
-                  }
-
-                  update_last_row(dt, old_index);
+                     //Remove_select_menu if existing, set the selected value;
+                     remove_select_menu("sel");
+                     update_last_row(dt, old_index);
                }
-              // return false;
                //If we have select menus they should appear now
                implement_select_menu( template[(cell[0][0].column)-1] + "_" + (cell[0][0].row).toString()  );
       });
+
+     //Remove_select_menu, set to selected value;
+      var remove_select_menu = (id) => {
+        if (document.getElementById(id) !== null) {
+
+           let e = document.getElementById(id);
+           let td_parent = document.getElementById(id).parentNode.parentNode;
+           let val = e.options[e.selectedIndex].value;
+           td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
+           console.log(td_parent.innerHTML);
+        }
+      }
 
       //Update the last row edited
       var implement_select_menu = (id) => {
@@ -189,7 +187,7 @@ for (let j of fieldwork) {
       //   $(id_jq).append("uuu");
          console.log($(id_jq)[0].innerHTML);
 
-           $(id_jq)[0].innerHTML = '<div id="species_identification_0"><select id="sel" class="target">' + returnstring + '</select></div>';
+           $(id_jq)[0].innerHTML = '<div id="'+ id +'"><select id="sel" class="target">' + returnstring + '</select></div>';
       //   $(id_jq).replaceWith("<td id='"+id+"' class='focus'><div><select>" + returnstring + "</select></div></td>");
       //   $(id).replaceWith("<td id='test'><div contenteditable=\"true\"><select>" + returnstring + "</select></div></td>");
          //Remove select from where
@@ -248,21 +246,14 @@ for (let j of fieldwork) {
        }
 
        $('#saveBtn').click( function() {
+        //  console.log(table.row({ selected: true }).data());
+          remove_select_menu("sel");
           let sel_row = table.row({ selected: true }).nodes();
-          console.log(sel_row);
-          console.log(table.row({ selected: true }).data());
-
-          //table.cells().nodes()[0]['id'] = "no1";
-          //table.cells().nodes()[2]['_DT_CellIndex'];
-
           update_last_row(sel_row, sel_row.index);
 
-
-
-          //console.log(table.cell({ selected: true }))
-
-          var data = table.data();
-          console.log(table);
+          //var data = table.data();
+          var nodes = table.nodes();
+          console.log(nodes);
           return false;
        } );
 
