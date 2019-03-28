@@ -39,6 +39,8 @@ let template =  [
     "species_identification",
     "label_name",
     "comment",
+    "my_own_field",
+    "my_own_field2",
     "id"
 ];
 
@@ -49,6 +51,8 @@ let fieldwork = [{
   "species": "fulmarus glacialis",
   "species_identification": "77",
   "label_name": "6745232",
+  "my_own_field": "test",
+  "my_own_field2": "test2",
   "comment": "dead"
 },
 {
@@ -58,6 +62,8 @@ let fieldwork = [{
   "species": "fulmarus glacialis",
   "species_identification": "78",
   "label_name": "6745211",
+  "my_own_field": "test",
+  "my_own_field2": "test2",
   "comment": "Juvenile"
 },
 {
@@ -67,10 +73,17 @@ let fieldwork = [{
   "species": "fulmarus glacialis",
   "species_identification": "79",
   "label_name": "4566432",
+  "my_own_field": "test",
+  "my_own_field2": "test2",
   "comment": ""
 }];
 
-let obj = {"name_list": name_list, "fieldwork":fieldwork, "template":template};
+let autocomplete = [
+    "my_own_field",
+    "my_own_field2"
+];
+
+let obj = {"name_list": name_list, "fieldwork":fieldwork, "template":template, "autocomplete":autocomplete};
 console.log(obj);
 
 
