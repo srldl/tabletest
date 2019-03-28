@@ -8,6 +8,28 @@ require('datatables.net-select' )( window, $ );
 require('datatables.net-autofill')( window, $ );
 require( 'datatables.net-keytable' )( window, $ );
 
+let species_list = ["ursus maritimus", "vulpes lagopus",
+      "boreogadus saida","salvelinus alpinus","mallotus villosus",
+      "strongylocentrotus droebachiensis","hyas araneus","buccinum undatum",
+      "buccinum glaciale", "mya truncata",
+      "gymnacanthus tricuspis","myoxocephalus scorpius",
+      "phoca vitulina","pagophilus groenlandicus",
+      "cystophora cristata","pusa hispida",
+      "odobenus rosmarus","leptonychotes weddellii",
+      "orcinus orca","delphinapterus leucas", "monodon monoceros",
+      "bubo scandiacus","larus hyperboreus","uria lomvia","uria aalge","rissa tridactyla",
+      "somateria mollissima","fratercula arctica","phalacrocorax aristotelis",
+      "larus argentatus", "morus bassanus", "fulmarus glacialis", "alle alle"];
+let matrix_list = ["egg","milk","whole blood","blood cell",
+      "plasma","serum","abdominal fat","subcutaneous fat",
+      "blubber","hair","feather","muscle","liver","brain",
+      "adrenal","whole animal","gonad",
+      "whole animal except lower part of foot",
+      "whole animal except closing muscle and siphon",
+      "digestive gland"];
+//Array to hold all lists
+let name_list = {"species_list":species_list, "matrix_list":matrix_list};
+
 
 //Testdata  template and fieldwork
 let template =  [
@@ -62,7 +84,9 @@ for (let j of fieldwork) {
   rowArr = [""];
   for (let k of template) {
      let text = (j[k] == '') ? '&nbsp;' : j[k];
-     rowArr.push('<div contenteditable="true" id="'+ k +'_'+(index_count).toString()+'" style="color:black;background-color:white">' + text + '</div>');
+     rowArr.push('<div contenteditable="true" style="color:black;background-color:white">' + text + '</div>');
+
+    // rowArr.push('<div contenteditable="true" id="'+ k +'_'+(index_count).toString()+'" style="color:black;background-color:white">' + text + '</div>');
   }
   //Id is the last entry, push directly without editable or id
   rowArr[rowArr.length-1] = j['id'];
@@ -140,8 +164,9 @@ for (let j of fieldwork) {
                //Get the new and the old index
                old_index = index;
                index = cell.index().row;
-            //   table.row(cell.index().row).nodes()[0].id = "oo";
-               console.log(table.row(cell.index().row).nodes());
+               // console.log(table.row(cell.index().row).nodes()[0]);
+               let id = template[(cell[0][0].column)-1] + "_" + (cell[0][0].row).toString();
+               console.log(id);
 
 
                //Get row
@@ -149,16 +174,30 @@ for (let j of fieldwork) {
 
                if ( $(row).hasClass('selected') ) {
                      //deselect
+                     if (document.getElementById("sel")){
+                       let parent = sel.parentNode.parentNode.id;
+                       //We have focused a select element, do not remove it
+                       if (parent === id){
+
+                          return false;
+                       }
+                     }
+
                      console.log("deselect");
-                     return false;
-               } else {
+                    // let id = template[(cell[0][0].column)-1] + "_" + (cell[0][0].row).toString();
+                    // let classname = $("#"+id).parent().prevObject[0].className;
+                    // console.log(classname);
+                     //We have chosen a cell with select menu, let user update before new action
+
+
+               }  //else {
 
                      //Remove_select_menu if existing, set the selected value;
                      remove_select_menu("sel");
                      update_last_row(dt, old_index);
-               }
+              // }
                //If we have select menus they should appear now
-               implement_select_menu( template[(cell[0][0].column)-1] + "_" + (cell[0][0].row).toString()  );
+               implement_select_menu( id );
       });
 
      //Remove_select_menu, set to selected value;
@@ -168,7 +207,8 @@ for (let j of fieldwork) {
            let e = document.getElementById(id);
            let td_parent = document.getElementById(id).parentNode.parentNode;
            let val = e.options[e.selectedIndex].value;
-           td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
+           td_parent.innerHTML = '<div contenteditable="true" style="color:black;background-color:white">'+val+'</div>';
+           //td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
            console.log(td_parent.innerHTML);
         }
       }
@@ -177,28 +217,32 @@ for (let j of fieldwork) {
       var implement_select_menu = (id) => {
 
         let id_jq = "#"+id;
-        var parent = $(id_jq).parent();
-        let text =   $(id_jq).text();
-         console.log(text);
+        let parent = $(id_jq).parent();
+        let text = $(id_jq).text();
+        let name_temp = ($(id_jq)[0].id).lastIndexOf("_");
+        let name = ($(id_jq)[0].id).slice(0,name_temp);
 
-            var returnstring = '';
-            let arr = ['feather','egg', 'liver'];
+      //  console.log("------------");
+      //  console.log(name_list[name+'_list']);
 
-            for (var i in arr) {
+        //If there is an array of select values matching the cell content
+        let arr = name_list[name+'_list'];
+        if (arr != undefined) {
+              let returnstring = '';
+
+              for (var i in arr) {
                   if (arr[i] === text) {
                     returnstring += "<option value='" + arr[i] + "'selected>" + arr[i] + "</option>";
                   } else {
                     returnstring += "<option value='" + arr[i] + "'>" + arr[i] + "</option>";
                   }
-         }
-      //   $(id_jq).append("uuu");
-         console.log($(id_jq)[0].innerHTML);
+              }
 
-           $(id_jq)[0].innerHTML = '<div id="'+ id +'"><select id="sel" class="target">' + returnstring + '</select></div>';
-      //   $(id_jq).replaceWith("<td id='"+id+"' class='focus'><div><select>" + returnstring + "</select></div></td>");
-      //   $(id).replaceWith("<td id='test'><div contenteditable=\"true\"><select>" + returnstring + "</select></div></td>");
-         //Remove select from where
-      }
+        //$(id_jq)[0].innerHTML = '<div id="'+ id +'"><select id="sel" class="target">' + returnstring + '</select></div>';
+        $(id_jq)[0].innerHTML = '<div><select id="sel" class="target">' + returnstring + '</select></div>';
+        //$(id_jq).replaceWith("<td id='"+id+"' class='focus'><div><select>" + returnstring + "</select></div></td>");
+             }
+    }
 
 
        $('#copyBtn').click( function() {
@@ -224,7 +268,9 @@ for (let j of fieldwork) {
                  rowArr = [""];
 
                  for (let i=0;i<template.length;i++){
-                    rowArr.push('<div contenteditable="true" id="'+ template[i] +'_'+ index_count.toString()+'" style="color:black;background-color:white">'+cpy_row[i+1]+'</div>');
+                    //rowArr.push('<div contenteditable="true" id="'+ template[i] +'_'+ index_count.toString()+'" style="color:black;background-color:white">'+cpy_row[i+1]+'</div>');
+
+                    rowArr.push('<div contenteditable="true" style="color:black;background-color:white">'+cpy_row[i+1]+'</div>');
                  };
                //Id shouldnot have id or be editable
                 rowArr[rowArr.length-1] = '';
@@ -274,7 +320,8 @@ for (let j of fieldwork) {
                  rowArr = [""];
 
                  template.forEach(function (i){
-                    rowArr.push('<div contenteditable="true" id="'+ i +'_'+ index_count.toString()+'" style="color:black;background-color:white">&nbsp;</div>');
+                   rowArr.push('<div contenteditable="true" style="color:black;background-color:white">&nbsp;</div>');
+                  //  rowArr.push('<div contenteditable="true" id="'+ i +'_'+ index_count.toString()+'" style="color:black;background-color:white">&nbsp;</div>');
                  });
                //Id should not be editable
                 rowArr[rowArr.length-1] = '';
