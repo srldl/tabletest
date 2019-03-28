@@ -70,6 +70,9 @@ let fieldwork = [{
   "comment": ""
 }];
 
+let obj = {"name_list": name_list, "fieldwork":fieldwork, "template":template};
+console.log(obj);
+
 
 let dataSet=[];
 let rowArr;
@@ -136,8 +139,8 @@ for (let j of fieldwork) {
   function add_id () {
     table.cells().nodes()[0]['id'] = "undefined_0";
     for  (let b=1;b<table.cells().nodes().length;b++){
-        let obj = table.cells().nodes()[b]['_DT_CellIndex'];
-        table.cells().nodes()[b]['id'] = template[obj.column-1] + "_" + obj.row.toString();
+        let temp_obj = table.cells().nodes()[b]['_DT_CellIndex'];
+        table.cells().nodes()[b]['id'] = template[temp_obj.column-1] + "_" + temp_obj.row.toString();
     }
     return false;
   }
