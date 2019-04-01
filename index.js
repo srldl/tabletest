@@ -1,12 +1,12 @@
 'use strict';
 
 const $  = require( 'jquery' );
-//const editTable = require( '@srldl/edit-tabletest/js/edit-table.js');
-//require( 'datatables.net-dt' )( window, $ );
+
 const dt = require( 'datatables.net' )( window, $ );
 require('datatables.net-select' )( window, $ );
 require('datatables.net-autofill')( window, $ );
-require( 'datatables.net-keytable' )( window, $ );
+require('datatables.net-keytable')( window, $ );
+
 
 let species_list = ["ursus maritimus", "vulpes lagopus",
       "boreogadus saida","salvelinus alpinus","mallotus villosus",
@@ -41,6 +41,7 @@ let template =  [
     "comment",
     "my_own_field",
     "my_own_field2",
+    "event_date",
     "id"
 ];
 
@@ -53,6 +54,7 @@ let fieldwork = [{
   "label_name": "6745232",
   "my_own_field": "test",
   "my_own_field2": "test2",
+  "event_date":"2019-04-01T06:42:23Z",
   "comment": "dead"
 },
 {
@@ -64,6 +66,7 @@ let fieldwork = [{
   "label_name": "6745211",
   "my_own_field": "test",
   "my_own_field2": "test2",
+  "event_date":"2019-09-01T06:42:23Z",
   "comment": "Juvenile"
 },
 {
@@ -75,16 +78,34 @@ let fieldwork = [{
   "label_name": "4566432",
   "my_own_field": "test",
   "my_own_field2": "test2",
+  "event_date":"2019-01-01T06:42:23Z",
   "comment": ""
 }];
 
-let autocomplete = [
+let autocompletes = [
     "my_own_field",
     "my_own_field2"
 ];
 
-let obj = {"name_list": name_list, "fieldwork":fieldwork, "template":template, "autocomplete":autocomplete};
-console.log(obj);
+let datefields =[
+    "event_date"
+];
+
+let obj = {"name_list": name_list, "fieldwork":fieldwork, "template":template, "autocompletes":autocompletes, "datefields":datefields};
+
+
+
+const picker = datepicker('#test',{
+  onSelect: (instance, date) =>
+  {
+    const value = date.getDate() +'-'+ (date.getMonth()+1) +'-'+ date.getFullYear();
+    document.getElementById("test").innerText = value;
+  }
+});
+
+
+
+//new Chronopic('input[type="datetime"]', { date: new Date(), format: "{YYYY}-{MM}-{DD}" });
 
 
 let dataSet=[];
@@ -101,7 +122,7 @@ for (let j of fieldwork) {
   for (let k of template) {
      let text = (j[k] == '') ? '&nbsp;' : j[k];
      rowArr.push('<div contenteditable="true" style="color:black;background-color:white">' + text + '</div>');
-
+  //   rowArr.push('<input type="text" name="fname" value='+ text+'>')
     // rowArr.push('<div contenteditable="true" id="'+ k +'_'+(index_count).toString()+'" style="color:black;background-color:white">' + text + '</div>');
   }
   //Id is the last entry, push directly without editable or id
@@ -152,8 +173,8 @@ for (let j of fieldwork) {
   function add_id () {
     table.cells().nodes()[0]['id'] = "undefined_0";
     for  (let b=1;b<table.cells().nodes().length;b++){
-        let temp_obj = table.cells().nodes()[b]['_DT_CellIndex'];
-        table.cells().nodes()[b]['id'] = template[temp_obj.column-1] + "_" + temp_obj.row.toString();
+        let temp_ = table.cells().nodes()[b]['_DT_CellIndex'];
+        table.cells().nodes()[b]['id'] = template[temp_.column-1] + "_" + temp_.row.toString();
     }
     return false;
   }
@@ -201,7 +222,7 @@ for (let j of fieldwork) {
 
                      console.log("deselect");
                     // let id = template[(cell[0][0].column)-1] + "_" + (cell[0][0].row).toString();
-                    // let classname = $("#"+id).parent().prevObject[0].className;
+                    // let classname = $("#"+id).parent().prevect[0].className;
                     // console.log(classname);
                      //We have chosen a cell with select menu, let user update before new action
 
@@ -214,7 +235,41 @@ for (let j of fieldwork) {
               // }
                //If we have select menus they should appear now
                implement_select_menu( id );
+               autocomplete(id);
       });
+
+      //Autocomplete for predesignated fields
+       var autocomplete = (id) => {
+         if (document.getElementById(id) !== null) {
+            console.log("autocomplete");
+            let sel_col = [];
+            //Get the name of the column
+            let name = id.slice(0, (id.lastIndexOf("_")) );
+            //Use the  column name to find the column index
+            let col_num = Object.keys(template).find(key => template[key] === name);
+            //Get all column data
+            let col = table.column(parseInt(col_num)+1).select().data();
+
+            for (var index = 0; index < col.length; index++) {
+                //Extract the values and add them to sel_col array
+                sel_col.push(col[index].replace(/<\/*div[^>]*>/g,""));
+            }
+            console.log(sel_col);
+
+            for (var i in sel_col) {
+                  returnstring += "<option value='" + arr[i] + ">";
+            }
+
+
+      $(id_jq)[0].innerHTML = '<div><select id="sel" class="target">' + returnstring + '</select></div>';
+
+
+
+            //Extract all values from the selected column and try autocomplete
+
+         }
+       }
+
 
      //Remove_select_menu, set to selected value;
       var remove_select_menu = (id) => {
@@ -237,9 +292,6 @@ for (let j of fieldwork) {
         let text = $(id_jq).text();
         let name_temp = ($(id_jq)[0].id).lastIndexOf("_");
         let name = ($(id_jq)[0].id).slice(0,name_temp);
-
-      //  console.log("------------");
-      //  console.log(name_list[name+'_list']);
 
         //If there is an array of select values matching the cell content
         let arr = name_list[name+'_list'];
@@ -315,8 +367,8 @@ for (let j of fieldwork) {
        }
 
        $('#saveBtn').click( function() {
-        //  console.log(table.row({ selected: true }).data());
-          remove_select_menu("sel");
+
+         remove_select_menu("sel");
           let sel_row = table.row({ selected: true }).nodes();
           update_last_row(sel_row, sel_row.index);
 
