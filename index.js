@@ -8,29 +8,6 @@ require('datatables.net-autofill')( window, $ );
 require('datatables.net-keytable')( window, $ );
 
 
-let species_list = ["ursus maritimus", "vulpes lagopus",
-      "boreogadus saida","salvelinus alpinus","mallotus villosus",
-      "strongylocentrotus droebachiensis","hyas araneus","buccinum undatum",
-      "buccinum glaciale", "mya truncata",
-      "gymnacanthus tricuspis","myoxocephalus scorpius",
-      "phoca vitulina","pagophilus groenlandicus",
-      "cystophora cristata","pusa hispida",
-      "odobenus rosmarus","leptonychotes weddellii",
-      "orcinus orca","delphinapterus leucas", "monodon monoceros",
-      "bubo scandiacus","larus hyperboreus","uria lomvia","uria aalge","rissa tridactyla",
-      "somateria mollissima","fratercula arctica","phalacrocorax aristotelis",
-      "larus argentatus", "morus bassanus", "fulmarus glacialis", "alle alle"];
-let matrix_list = ["egg","milk","whole blood","blood cell",
-      "plasma","serum","abdominal fat","subcutaneous fat",
-      "blubber","hair","feather","muscle","liver","brain",
-      "adrenal","whole animal","gonad",
-      "whole animal except lower part of foot",
-      "whole animal except closing muscle and siphon",
-      "digestive gland"];
-//Array to hold all lists
-let name_list = {"species_list":species_list, "matrix_list":matrix_list};
-
-
 //Testdata  template and fieldwork
 let template =  [
     "matrix",
@@ -82,30 +59,34 @@ let fieldwork = [{
   "comment": ""
 }];
 
-let autocompletes = [
-    "my_own_field",
-    "my_own_field2"
-];
-
-let datefields =[
-    "event_date"
-];
-
-let obj = {"name_list": name_list, "fieldwork":fieldwork, "template":template, "autocompletes":autocompletes, "datefields":datefields};
 
 
+let species_list = ["ursus maritimus", "vulpes lagopus",
+      "boreogadus saida","salvelinus alpinus","mallotus villosus",
+      "strongylocentrotus droebachiensis","hyas araneus","buccinum undatum",
+      "buccinum glaciale", "mya truncata",
+      "gymnacanthus tricuspis","myoxocephalus scorpius",
+      "phoca vitulina","pagophilus groenlandicus",
+      "cystophora cristata","pusa hispida",
+      "odobenus rosmarus","leptonychotes weddellii",
+      "orcinus orca","delphinapterus leucas", "monodon monoceros",
+      "bubo scandiacus","larus hyperboreus","uria lomvia","uria aalge","rissa tridactyla",
+      "somateria mollissima","fratercula arctica","phalacrocorax aristotelis",
+      "larus argentatus", "morus bassanus", "fulmarus glacialis", "alle alle"];
+let matrix_list = ["egg","milk","whole blood","blood cell",
+      "plasma","serum","abdominal fat","subcutaneous fat",
+      "blubber","hair","feather","muscle","liver","brain",
+      "adrenal","whole animal","gonad",
+      "whole animal except lower part of foot",
+      "whole animal except closing muscle and siphon",
+      "digestive gland"];
 
-const picker = datepicker('#test',{
-  onSelect: (instance, date) =>
-  {
-    const value = date.getDate() +'-'+ (date.getMonth()+1) +'-'+ date.getFullYear();
-    document.getElementById("test").innerText = value;
-  }
-});
-
-
-
-//new Chronopic('input[type="datetime"]', { date: new Date(), format: "{YYYY}-{MM}-{DD}" });
+//Input object
+let obj = { "fieldwork":fieldwork,
+            "template":template,
+            "selectlist": {"species":species_list, "matrix":matrix_list},
+            "autocompletes":["my_own_field","my_own_field2"],
+            "datefields":["event_date"]};
 
 
 let dataSet=[];
@@ -121,9 +102,7 @@ for (let j of fieldwork) {
   rowArr = [""];
   for (let k of template) {
      let text = (j[k] == '') ? '&nbsp;' : j[k];
-     rowArr.push('<div contenteditable="true" style="color:black;background-color:white">' + text + '</div>');
-  //   rowArr.push('<input type="text" name="fname" value='+ text+'>')
-    // rowArr.push('<div contenteditable="true" id="'+ k +'_'+(index_count).toString()+'" style="color:black;background-color:white">' + text + '</div>');
+       rowArr.push('<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>');
   }
   //Id is the last entry, push directly without editable or id
   rowArr[rowArr.length-1] = j['id'];
@@ -143,20 +122,14 @@ for (let j of fieldwork) {
             table = $('#table1').DataTable();
           } ).DataTable( {
 
-          stateSave: true,
+            stateSave: true,
             data: dataSet,
             columns: columnsArr,
-        //  keys: true,
-          autoFill: {
+            autoFill: {
             columns: ':not(:last-child)'
-        },
+            },
             select:'single',
             keys: true,  //connected events key-blur
-          //  rowId:  ,
-          /*  rowId: function(index_count) {
-              console.log(index_count);
-              return   index_count;
-            }, */
             "ordering": true
         } );
 
@@ -167,17 +140,17 @@ for (let j of fieldwork) {
            } );
        } ).draw();
 
-  add_id();
+  //add_id();
 
   //Add id to <td> html element
-  function add_id () {
+/*  function add_id () {
     table.cells().nodes()[0]['id'] = "undefined_0";
     for  (let b=1;b<table.cells().nodes().length;b++){
         let temp_ = table.cells().nodes()[b]['_DT_CellIndex'];
         table.cells().nodes()[b]['id'] = template[temp_.column-1] + "_" + temp_.row.toString();
     }
     return false;
-  }
+  }*/
 
 
        //Get the number of new or copied row we want
@@ -194,50 +167,55 @@ for (let j of fieldwork) {
            }
        }
 
-
-       let index = 0;
-       let old_index = 0;
-       table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
-               //Get the new and the old index
-               old_index = index;
-               index = cell.index().row;
-               // console.log(table.row(cell.index().row).nodes()[0]);
-               let id = template[(cell[0][0].column)-1] + "_" + (cell[0][0].row).toString();
-               console.log(id);
-
-
-               //Get row
-               var row = dt.row( cell.index().row ).node();
-
-               if ( $(row).hasClass('selected') ) {
-                     //deselect
-                     if (document.getElementById("sel")){
-                       let parent = sel.parentNode.parentNode.id;
-                       //We have focused a select element, do not remove it
-                       if (parent === id){
-
-                          return false;
-                       }
-                     }
-
-                     console.log("deselect");
-                    // let id = template[(cell[0][0].column)-1] + "_" + (cell[0][0].row).toString();
-                    // let classname = $("#"+id).parent().prevect[0].className;
-                    // console.log(classname);
-                     //We have chosen a cell with select menu, let user update before new action
+       //Datepicker
+    /*   const picker = datepicker(id,{
+         onSelect: (instance, date) =>
+         {
+           const value = date.getDate() +'-'+ (date.getMonth()+1) +'-'+ date.getFullYear();
+           document.getElementById("test").innerText = value;
+          // $(id) = value;
+         }
+       });*/
 
 
-               }  //else {
+      //Update to select menus, autocomplete or datepicker
+      table.on( 'key-focus', function ( e, datatable, cell, originalEvent ) {
+        console.log("key-focus");
 
-                     //Remove_select_menu if existing, set the selected value;
-                     remove_select_menu("sel");
-                     update_last_row(dt, old_index);
-              // }
-               //If we have select menus they should appear now
-               implement_select_menu( id );
-               autocomplete(id);
+        //Find column
+        let colname = template[cell.index().column-1];
+        let id =  colname+'_'+cell.index().row;
+        //if datefield
+        if (obj.datefields.includes(colname)) {
+
+            datepicker('#'+id);
+        //if select
+        } else if (obj.selectlist.hasOwnProperty(colname)) {
+           console.log("select");
+           implement_select(id);
+        //if autocomplete
+        } else if (obj.autocompletes.includes(colname)){
+           console.log("autocomplete");
+        }
+
       });
 
+      //On leave - update data
+      table.on( 'key-blur', function ( e, datatable, cell ) {
+        //console.log("key-blur");
+        //Get cell id
+        let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
+        let text = table.$('input#'+temp)[0].value;
+        //Get old row data from input
+        let rowData = datatable.row( cell.index().row ).data();
+        //Create new data and update table
+        rowData[cell[0][0].column]='<td id="'+ temp +'"><input type="text" id="'+ temp +'"value="'+ text+'"></td>'
+        let rowNode = table.row(cell.index().row).data(rowData).draw(false);
+
+      });
+
+      let index = 0;
+      let old_index = 0;
       //Autocomplete for predesignated fields
        var autocomplete = (id) => {
          if (document.getElementById(id) !== null) {
@@ -254,14 +232,14 @@ for (let j of fieldwork) {
                 //Extract the values and add them to sel_col array
                 sel_col.push(col[index].replace(/<\/*div[^>]*>/g,""));
             }
-            console.log(sel_col);
+          //  console.log(sel_col);
 
-            for (var i in sel_col) {
-                  returnstring += "<option value='" + arr[i] + ">";
-            }
+          //  for (var i in sel_col) {
+          //        returnstring += "<option value='" + arr[i] + ">";
+          //  }
 
 
-      $(id_jq)[0].innerHTML = '<div><select id="sel" class="target">' + returnstring + '</select></div>';
+      //$(id_jq)[0].innerHTML = '<div><select id="sel" class="target">' + returnstring + '</select></div>';
 
 
 
@@ -278,14 +256,15 @@ for (let j of fieldwork) {
            let e = document.getElementById(id);
            let td_parent = document.getElementById(id).parentNode.parentNode;
            let val = e.options[e.selectedIndex].value;
-           td_parent.innerHTML = '<div contenteditable="true" style="color:black;background-color:white">'+val+'</div>';
+          // td_parent.innerHTML = '<div contenteditable="true" style="color:black;background-color:white">'+val+'</div>';
+           td_parent.innerHTML = '<input type="text" value="'+val+'">';
            //td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
            console.log(td_parent.innerHTML);
         }
       }
 
       //Update the last row edited
-      var implement_select_menu = (id) => {
+      var implement_select = (id) => {
 
         let id_jq = "#"+id;
         let parent = $(id_jq).parent();
@@ -294,7 +273,8 @@ for (let j of fieldwork) {
         let name = ($(id_jq)[0].id).slice(0,name_temp);
 
         //If there is an array of select values matching the cell content
-        let arr = name_list[name+'_list'];
+        console.log(obj.selectlist[name]);
+        let arr = obj.selectlist[name];
         if (arr != undefined) {
               let returnstring = '';
 
@@ -305,10 +285,10 @@ for (let j of fieldwork) {
                     returnstring += "<option value='" + arr[i] + "'>" + arr[i] + "</option>";
                   }
               }
+            console.log($(id_jq)[0].innerHTML);
+           $(id_jq)[0].innerHTML = '<select id="sel" class="target">' + returnstring + '</select>';
+           console.log($(id_jq)[0]);
 
-        //$(id_jq)[0].innerHTML = '<div id="'+ id +'"><select id="sel" class="target">' + returnstring + '</select></div>';
-        $(id_jq)[0].innerHTML = '<div><select id="sel" class="target">' + returnstring + '</select></div>';
-        //$(id_jq).replaceWith("<td id='"+id+"' class='focus'><div><select>" + returnstring + "</select></div></td>");
              }
     }
 
@@ -357,22 +337,27 @@ for (let j of fieldwork) {
        var update_last_row = (dt, old_index) => {
          //Get new values
          let row_content = dt.row( old_index ).node().innerHTML;
+
          //Change a long text string HTML style into an div array
          //Only with node() we can get the updated value.
-         let row_content2 = row_content.replace(/<\/*td[^>]*>/g,"")
-                                       .replace(/<\/div>/g,"</div>,")
-                                       .replace(/[^<]/,",").split(",");
+         let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
+         row_content2.splice(-1,1);
+
          //Draw (publish) array
          let rowNode = table.row(old_index).data(row_content2).draw(false);
        }
 
        $('#saveBtn').click( function() {
 
-         remove_select_menu("sel");
-          let sel_row = table.row({ selected: true }).nodes();
-          update_last_row(sel_row, sel_row.index);
+      //   remove_select_menu("sel");
+      //    let sel_row = table.row({ selected: true }).nodes();
+      //    console.log(sel_row);
+      //    update_last_row(sel_row, sel_row.index);
+      //     var data = table.$('input, select').serialize();
 
-          //var data = table.data();
+            var data = table.$('input, select').serialize();
+          //let data = table.data();
+          //console.log(data);
           var nodes = table.nodes();
           console.log(nodes);
           return false;
@@ -388,7 +373,8 @@ for (let j of fieldwork) {
                  rowArr = [""];
 
                  template.forEach(function (i){
-                   rowArr.push('<div contenteditable="true" style="color:black;background-color:white">&nbsp;</div>');
+                //   rowArr.push('<div contenteditable="true" style="color:black;background-color:white">&nbsp;</div>');
+                   rowArr.push('<input type="text">');
                   //  rowArr.push('<div contenteditable="true" id="'+ i +'_'+ index_count.toString()+'" style="color:black;background-color:white">&nbsp;</div>');
                  });
                //Id should not be editable
