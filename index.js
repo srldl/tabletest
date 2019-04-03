@@ -60,7 +60,6 @@ let fieldwork = [{
 }];
 
 
-
 let species_list = ["ursus maritimus", "vulpes lagopus",
       "boreogadus saida","salvelinus alpinus","mallotus villosus",
       "strongylocentrotus droebachiensis","hyas araneus","buccinum undatum",
@@ -73,6 +72,7 @@ let species_list = ["ursus maritimus", "vulpes lagopus",
       "bubo scandiacus","larus hyperboreus","uria lomvia","uria aalge","rissa tridactyla",
       "somateria mollissima","fratercula arctica","phalacrocorax aristotelis",
       "larus argentatus", "morus bassanus", "fulmarus glacialis", "alle alle"];
+
 let matrix_list = ["egg","milk","whole blood","blood cell",
       "plasma","serum","abdominal fat","subcutaneous fat",
       "blubber","hair","feather","muscle","liver","brain",
@@ -97,12 +97,45 @@ function increment_index_count(){
     index_count++;
 }
 
+//Create select elements
+var implement_select = (id,count,text) => {
+  //Find the select options from the input object named obj
+  let arr = obj.selectlist[id];
+  if (arr != undefined) {
+       let returnstring = '';
+
+        for (let i in arr) {
+            if (arr[i] === text) {
+              returnstring += "<option value='" + arr[i] + "'selected>" + arr[i] + "</option>";
+            } else {
+              returnstring += "<option value='" + arr[i] + "'>" + arr[i] + "</option>";
+            }
+        }
+    return '<td id ="'+ id +'_'+ count.toString()+'"><select id="'+ id +'_'+ count.toString()+'" class="target">' + returnstring + '</select></td>';
+   }
+}
+
+
+
+//Return input or select element
+var checkHtmlComponent = (text,k) => {
+  let id = obj.template[k];
+
+  //if this is a select element, call implement_select to get the select component
+  if (obj.selectlist.hasOwnProperty(k)) {
+     return implement_select(k,index_count,text);
+  } else {
+     //This is an input element
+     return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>';
+  }
+}
+
 //sort
 for (let j of fieldwork) {
   rowArr = [""];
   for (let k of template) {
      let text = (j[k] == '') ? '&nbsp;' : j[k];
-       rowArr.push('<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>');
+       rowArr.push(checkHtmlComponent(text,k));
   }
   //Id is the last entry, push directly without editable or id
   rowArr[rowArr.length-1] = j['id'];
@@ -152,7 +185,6 @@ for (let j of fieldwork) {
     return false;
   }*/
 
-
        //Get the number of new or copied row we want
        //If null, return 1 for one row added
        var get_rows = () => {
@@ -178,40 +210,36 @@ for (let j of fieldwork) {
        });*/
 
 
-      //Update to select menus, autocomplete or datepicker
-      table.on( 'key-focus', function ( e, datatable, cell, originalEvent ) {
-        console.log("key-focus");
-
-        //Find column
-        let colname = template[cell.index().column-1];
-        let id =  colname+'_'+cell.index().row;
-        //if datefield
-        if (obj.datefields.includes(colname)) {
-
-            datepicker('#'+id);
-        //if select
-        } else if (obj.selectlist.hasOwnProperty(colname)) {
-           console.log("select");
-           implement_select(id);
-        //if autocomplete
-        } else if (obj.autocompletes.includes(colname)){
-           console.log("autocomplete");
-        }
-
-      });
-
       //On leave - update data
       table.on( 'key-blur', function ( e, datatable, cell ) {
-        //console.log("key-blur");
-        //Get cell id
-        let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
-        let text = table.$('input#'+temp)[0].value;
-        //Get old row data from input
-        let rowData = datatable.row( cell.index().row ).data();
-        //Create new data and update table
-        rowData[cell[0][0].column]='<td id="'+ temp +'"><input type="text" id="'+ temp +'"value="'+ text+'"></td>'
-        let rowNode = table.row(cell.index().row).data(rowData).draw(false);
 
+        //Get column header (id_col)
+        let id_col = parseInt(cell.index().column) -1;
+
+        //if this is a select element, call implement_select to get the select component
+        if (obj.selectlist.hasOwnProperty(obj.template[id_col])) {
+              //Get the element id index
+              let id = obj.template[id_col] + "_" + cell.index().row;
+              console.log(id);
+              let select_option_index = table.$('select#'+id)[0].selectedIndex;
+              //Get selected element value
+              let text = table.$('select#'+id)[0][select_option_index].value;
+              //Insert into array
+              let sel_row = table.row(cell.index().row).data();
+              //Update cell with changed select menu
+              sel_row[id_col+1] = implement_select(obj.template[id_col],cell.index().row,text);
+              let rowNode = table.row(cell.index().row).data(sel_row).draw(false);
+        } else {
+              //Get cell id
+              let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
+              //console.log(table.$('input#'+temp));
+              let text = table.$('input#'+temp)[0].value;
+              //Get old row data from input
+              let rowData = datatable.row( cell.index().row ).data();
+              //Create new data and update table
+              rowData[cell[0][0].column]='<td id="'+ temp +'"><input type="text" id="'+ temp +'"value="'+ text+'"></td>';
+              let rowNode = table.row(cell.index().row).data(rowData).draw(false);
+        }
       });
 
       let index = 0;
@@ -232,15 +260,6 @@ for (let j of fieldwork) {
                 //Extract the values and add them to sel_col array
                 sel_col.push(col[index].replace(/<\/*div[^>]*>/g,""));
             }
-          //  console.log(sel_col);
-
-          //  for (var i in sel_col) {
-          //        returnstring += "<option value='" + arr[i] + ">";
-          //  }
-
-
-      //$(id_jq)[0].innerHTML = '<div><select id="sel" class="target">' + returnstring + '</select></div>';
-
 
 
             //Extract all values from the selected column and try autocomplete
@@ -250,7 +269,7 @@ for (let j of fieldwork) {
 
 
      //Remove_select_menu, set to selected value;
-      var remove_select_menu = (id) => {
+  /*    var remove_select_menu = (id) => {
         if (document.getElementById(id) !== null) {
 
            let e = document.getElementById(id);
@@ -261,36 +280,7 @@ for (let j of fieldwork) {
            //td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
            console.log(td_parent.innerHTML);
         }
-      }
-
-      //Update the last row edited
-      var implement_select = (id) => {
-
-        let id_jq = "#"+id;
-        let parent = $(id_jq).parent();
-        let text = $(id_jq).text();
-        let name_temp = ($(id_jq)[0].id).lastIndexOf("_");
-        let name = ($(id_jq)[0].id).slice(0,name_temp);
-
-        //If there is an array of select values matching the cell content
-        console.log(obj.selectlist[name]);
-        let arr = obj.selectlist[name];
-        if (arr != undefined) {
-              let returnstring = '';
-
-              for (var i in arr) {
-                  if (arr[i] === text) {
-                    returnstring += "<option value='" + arr[i] + "'selected>" + arr[i] + "</option>";
-                  } else {
-                    returnstring += "<option value='" + arr[i] + "'>" + arr[i] + "</option>";
-                  }
-              }
-            console.log($(id_jq)[0].innerHTML);
-           $(id_jq)[0].innerHTML = '<select id="sel" class="target">' + returnstring + '</select>';
-           console.log($(id_jq)[0]);
-
-             }
-    }
+      }*/
 
 
        $('#copyBtn').click( function() {
