@@ -31,7 +31,7 @@ let fieldwork = [{
   "label_name": "6745232",
   "my_own_field": "test",
   "my_own_field2": "test2",
-  "event_date":"2019-04-01T06:42:23Z",
+  "event_date":"2019-02-01",
   "comment": "dead"
 },
 {
@@ -43,7 +43,7 @@ let fieldwork = [{
   "label_name": "6745211",
   "my_own_field": "test",
   "my_own_field2": "test2",
-  "event_date":"2019-09-01T06:42:23Z",
+  "event_date":"2019-09-01",
   "comment": "Juvenile"
 },
 {
@@ -55,7 +55,7 @@ let fieldwork = [{
   "label_name": "4566432",
   "my_own_field": "test",
   "my_own_field2": "test2",
-  "event_date":"2019-01-01T06:42:23Z",
+  "event_date":"2019-01-01",
   "comment": ""
 }];
 
@@ -116,17 +116,18 @@ var implement_select = (id,count,text) => {
 }
 
 
-
 //Return input or select element
 var checkHtmlComponent = (text,k) => {
   let id = obj.template[k];
 
   //if this is a select element, call implement_select to get the select component
   if (obj.selectlist.hasOwnProperty(k)) {
-     return implement_select(k,index_count,text);
+      return implement_select(k,index_count,text);
+  } else if (obj.datefields.includes(k)) {
+      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="date" id="'+ k +'_'+(index_count).toString()+'" class="dateelement" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>';
   } else {
-     //This is an input element
-     return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>';
+      //This is an input element
+      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>';
   }
 }
 
@@ -148,6 +149,7 @@ for (let j of fieldwork) {
   for (let value of template) {
     columnsArr.push({ 'title': value });
   }
+
 
     let table;
     $(document).ready(function() {
@@ -173,6 +175,7 @@ for (let j of fieldwork) {
            } );
        } ).draw();
 
+  // new Chronopic('input[type="datetime"]', { date: new Date(), format: "{YYYY}-{MM}-{DD}" });
   //add_id();
 
   //Add id to <td> html element
@@ -184,6 +187,10 @@ for (let j of fieldwork) {
     }
     return false;
   }*/
+
+
+
+
 
        //Get the number of new or copied row we want
        //If null, return 1 for one row added
@@ -200,14 +207,15 @@ for (let j of fieldwork) {
        }
 
        //Datepicker
-    /*   const picker = datepicker(id,{
+  /*     const picker = datepicker(".dateelement2",{
          onSelect: (instance, date) =>
          {
-           const value = date.getDate() +'-'+ (date.getMonth()+1) +'-'+ date.getFullYear();
-           document.getElementById("test").innerText = value;
-          // $(id) = value;
+           alert(date);
+          // const value = date.getDate() +'-'+ (date.getMonth()+1) +'-'+ date.getFullYear();
+          // document.getElementById("test").innerText = value;
+
          }
-       });*/
+       }); */
 
 
       //On leave - update data
@@ -317,8 +325,7 @@ for (let j of fieldwork) {
                 increment_index_count();
                };
                add_id();
-               $( rowNode )
-                       .animate( { color: 'blue' } );
+
                }
                return false;
        } );
@@ -363,9 +370,9 @@ for (let j of fieldwork) {
                  rowArr = [""];
 
                  template.forEach(function (i){
-                //   rowArr.push('<div contenteditable="true" style="color:black;background-color:white">&nbsp;</div>');
+
                    rowArr.push('<input type="text">');
-                  //  rowArr.push('<div contenteditable="true" id="'+ i +'_'+ index_count.toString()+'" style="color:black;background-color:white">&nbsp;</div>');
+
                  });
                //Id should not be editable
                 rowArr[rowArr.length-1] = '';
