@@ -175,21 +175,17 @@ for (let j of fieldwork) {
            } );
        } ).draw();
 
-  // new Chronopic('input[type="datetime"]', { date: new Date(), format: "{YYYY}-{MM}-{DD}" });
-  //add_id();
 
-  //Add id to <td> html element
-/*  function add_id () {
+
+  //Add id to the <td> html element
+  function add_id () {
     table.cells().nodes()[0]['id'] = "undefined_0";
     for  (let b=1;b<table.cells().nodes().length;b++){
         let temp_ = table.cells().nodes()[b]['_DT_CellIndex'];
         table.cells().nodes()[b]['id'] = template[temp_.column-1] + "_" + temp_.row.toString();
     }
     return false;
-  }*/
-
-
-
+  }
 
 
        //Get the number of new or copied row we want
@@ -206,16 +202,16 @@ for (let j of fieldwork) {
            }
        }
 
-       //Datepicker
-  /*     const picker = datepicker(".dateelement2",{
-         onSelect: (instance, date) =>
-         {
-           alert(date);
-          // const value = date.getDate() +'-'+ (date.getMonth()+1) +'-'+ date.getFullYear();
-          // document.getElementById("test").innerText = value;
 
-         }
-       }); */
+    table.on( 'key-focus', function ( e, datatable, cell, originalEvent ) {
+            //Check if field for autocomplete
+             var id_col = cell.index().column;
+             if ((obj.autocompletes).includes(obj.template[id_col-1])){
+               autocomplete(id_col-1);
+               console.log("select");
+             }
+    } );
+
 
 
       //On leave - update data
@@ -228,7 +224,6 @@ for (let j of fieldwork) {
         if (obj.selectlist.hasOwnProperty(obj.template[id_col])) {
               //Get the element id index
               let id = obj.template[id_col] + "_" + cell.index().row;
-              console.log(id);
               let select_option_index = table.$('select#'+id)[0].selectedIndex;
               //Get selected element value
               let text = table.$('select#'+id)[0][select_option_index].value;
@@ -240,7 +235,7 @@ for (let j of fieldwork) {
         } else {
               //Get cell id
               let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
-              //console.log(table.$('input#'+temp));
+
               let text = table.$('input#'+temp)[0].value;
               //Get old row data from input
               let rowData = datatable.row( cell.index().row ).data();
@@ -370,9 +365,7 @@ for (let j of fieldwork) {
                  rowArr = [""];
 
                  template.forEach(function (i){
-
-                   rowArr.push('<input type="text">');
-
+                   rowArr.push(checkHtmlComponent('',i));
                  });
                //Id should not be editable
                 rowArr[rowArr.length-1] = '';
