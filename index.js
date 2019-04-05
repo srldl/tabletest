@@ -124,10 +124,10 @@ var checkHtmlComponent = (text,k) => {
   if (obj.selectlist.hasOwnProperty(k)) {
       return implement_select(k,index_count,text);
   } else if (obj.datefields.includes(k)) {
-      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="date" id="'+ k +'_'+(index_count).toString()+'" class="dateelement" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>';
+      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="date" id="'+ k +'_'+(index_count).toString()+'" class="dateelement" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></td>';
   } else {
       //This is an input element
-      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'"value="'+ text+'"></td>';
+      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></td>';
   }
 }
 
@@ -216,7 +216,7 @@ for (let j of fieldwork) {
 
       //On leave - update data
       table.on( 'key-blur', function ( e, datatable, cell ) {
-
+        console.log('key-blur');
         //Get column header (id_col)
         let id_col = parseInt(cell.index().column) -1;
 
@@ -232,10 +232,9 @@ for (let j of fieldwork) {
               //Update cell with changed select menu
               sel_row[id_col+1] = implement_select(obj.template[id_col],cell.index().row,text);
               let rowNode = table.row(cell.index().row).data(sel_row).draw(false);
-        } else {
+        } else if (table.$('input')){
               //Get cell id
               let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
-
               let text = table.$('input#'+temp)[0].value;
               //Get old row data from input
               let rowData = datatable.row( cell.index().row ).data();
@@ -271,20 +270,6 @@ for (let j of fieldwork) {
        }
 
 
-     //Remove_select_menu, set to selected value;
-  /*    var remove_select_menu = (id) => {
-        if (document.getElementById(id) !== null) {
-
-           let e = document.getElementById(id);
-           let td_parent = document.getElementById(id).parentNode.parentNode;
-           let val = e.options[e.selectedIndex].value;
-          // td_parent.innerHTML = '<div contenteditable="true" style="color:black;background-color:white">'+val+'</div>';
-           td_parent.innerHTML = '<input type="text" value="'+val+'">';
-           //td_parent.innerHTML = '<div contenteditable="true" id="'+ td_parent.id +'" style="color:black;background-color:white">'+val+'</div>';
-           console.log(td_parent.innerHTML);
-        }
-      }*/
-
 
        $('#copyBtn').click( function() {
 
@@ -293,27 +278,20 @@ for (let j of fieldwork) {
                alert("Please select at least one row");
            } else {
                //Get hold of the content
-               let sel_row =   table.row({ selected: true }).data();
-               let cpy_row = [];
+               let sel_row = table.row({ selected: true }).data();
 
-               //Get rid of old divs - extract innerHTML from text string
-               for (var c of sel_row){
-                    cpy_row.push(c.replace(/<\/*div[^>]*>/g,""));
-               }
-
+               //Get number of selected column
                let num_rows = get_rows();
                let rowArr, rowNode;
 
-               //Get number of rows
+               //Go through all selected rows to be copied
                for (let j=0;j<(num_rows);j++){
                  rowArr = [""];
 
-                 for (let i=0;i<template.length;i++){
-                    //rowArr.push('<div contenteditable="true" id="'+ template[i] +'_'+ index_count.toString()+'" style="color:black;background-color:white">'+cpy_row[i+1]+'</div>');
-
-                    rowArr.push('<div contenteditable="true" style="color:black;background-color:white">'+cpy_row[i+1]+'</div>');
+                 for (let i=0;i<obj.template.length;i++){
+                    rowArr.push(sel_row[i+1].replace(/_[0-9]+\"/g, "_"+index_count+'"'));
                  };
-               //Id shouldnot have id or be editable
+               //Id should not have id or be editable
                 rowArr[rowArr.length-1] = '';
                 rowNode = table.row.add( rowArr ).draw().node();
                 rowNode.id = "row_"+index_count;
