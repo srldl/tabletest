@@ -7,6 +7,7 @@ require('datatables.net-select' )( window, $ );
 require('datatables.net-autofill')( window, $ );
 require('datatables.net-keytable')( window, $ );
 
+  var currentFocus;
 
 //Testdata  template and fieldwork
 let template =  [
@@ -89,6 +90,7 @@ let obj = { "fieldwork":fieldwork,
             "datefields":["event_date"]};
 
 
+
 let dataSet=[];
 let rowArr;
 //This counter holds max row_number
@@ -116,6 +118,7 @@ var implement_select = (id,count,text) => {
 }
 
 
+
 //Return input or select element
 var checkHtmlComponent = (text,k) => {
   let id = obj.template[k];
@@ -127,9 +130,10 @@ var checkHtmlComponent = (text,k) => {
       return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="date" id="'+ k +'_'+(index_count).toString()+'" class="dateelement" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></td>';
   } else {
       //This is an input element
-      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></td>';
+      return '<td id="'+ k +'_'+(index_count).toString()+'"><div class="autocomplete" ><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></div></td>';
   }
 }
+
 
 //sort
 for (let j of fieldwork) {
@@ -149,6 +153,9 @@ for (let j of fieldwork) {
   for (let value of template) {
     columnsArr.push({ 'title': value });
   }
+
+
+
 
 
     let table;
@@ -174,7 +181,6 @@ for (let j of fieldwork) {
                cell.innerHTML = i+1;
            } );
        } ).draw();
-
 
 
   //Add id to the <td> html element
@@ -203,12 +209,53 @@ for (let j of fieldwork) {
        }
 
 
-    table.on( 'key-focus', function ( e, datatable, cell, originalEvent ) {
-            //Check if field for autocomplete
-             var id_col = cell.index().column;
-             if ((obj.autocompletes).includes(obj.template[id_col-1])){
-               autocomplete(id_col-1);
-               console.log("select");
+    table.on( 'key', function ( e, datatable, key, cell, originalEvent ) {
+            //Check if field use autocomplete
+            let id_col = cell.index().column;
+            let id = obj.template[id_col-1] + "_" + cell.index().row;
+            if ((obj.autocompletes).includes(obj.template[id_col-1])){
+               //Remove old list
+               console.log("autocomplete " + id);
+              // console.log(originalEvent.originalEvent.keyCode);
+               let input_field = document.getElementById(obj.template[id_col-1]+"_"+cell.index().row);
+               var a, b, i, val = input_field.value;
+               let arr = template;
+    /*close any already open lists of autocompleted values*/
+    //closeAllLists(cell);
+
+    if (!val) { return false;}
+    currentFocus = -1;
+    /*create a DIV element that will contain the items (values):*/
+    a = document.createElement("DIV");
+    a.setAttribute("id", input_field.id + "autocomplete-list");
+    a.setAttribute("class", "autocomplete-items");
+    console.log(a);
+    /*append the DIV element as a child of the autocomplete container:*/
+    input_field.parentNode.appendChild(a);
+    /*for each item in the array...*/
+    for (i = 0; i < arr.length; i++) {
+      /*check if the item starts with the same letters as the text field value:*/
+      if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        /*create a DIV element for each matching element:*/
+        b = document.createElement("DIV");
+        /*make the matching letters bold:*/
+        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+        b.innerHTML += arr[i].substr(val.length);
+        /*insert a input field that will hold the current array item's value:*/
+        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+        /*execute a function when someone clicks on the item value (DIV element):*/
+           b.addEventListener("click", function(e) {
+           /*insert the value for the autocomplete text field:*/
+           input_field.value = this.getElementsByTagName("input")[0].value;
+           /*close the list of autocompleted values,
+           (or any other open lists of autocompleted values:*/
+           closeAllLists(cell);
+       });
+       a.appendChild(b);
+     }
+   }
+
+
              }
     } );
 
@@ -217,6 +264,8 @@ for (let j of fieldwork) {
       //On leave - update data
       table.on( 'key-blur', function ( e, datatable, cell ) {
         console.log('key-blur');
+        //Close all open lists
+        closeAllLists(cell);
         //Get column header (id_col)
         let id_col = parseInt(cell.index().column) -1;
 
@@ -366,4 +415,36 @@ for (let j of fieldwork) {
              }
               return false;
            });
+
+           function addActive(x) {
+           /*a function to classify an item as "active":*/
+           if (!x) return false;
+           /*start by removing the "active" class on all items:*/
+           removeActive(x);
+           if (currentFocus >= x.length) currentFocus = 0;
+           if (currentFocus < 0) currentFocus = (x.length - 1);
+           /*add class "autocomplete-active":*/
+           x[currentFocus].classList.add("autocomplete-active");
+           }
+
+           function removeActive(x) {
+           /*a function to remove the "active" class from all autocomplete items:*/
+           for (var i = 0; i < x.length; i++) {
+            x[i].classList.remove("autocomplete-active");
+           }
+           }
+
+           function closeAllLists(cell,elmnt) {
+             console.log(elmnt);
+           /*close all autocomplete lists in the document,
+           except the one passed as an argument:*/
+           let input_field = document.getElementById(obj.template[cell.index().column-1]+"_"+cell.index().row);
+           var x = document.getElementsByClassName("autocomplete-items");
+           for (var i = 0; i < x.length; i++) {
+              console.log(input_field);
+              if (elmnt != x[i] && elmnt != input_field) {
+              x[i].parentNode.removeChild(x[i]);
+            }
+           }
+           }
 });
