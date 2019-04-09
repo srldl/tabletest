@@ -42,7 +42,7 @@ let fieldwork = [{
   "species": "fulmarus glacialis",
   "species_identification": "78",
   "label_name": "6745211",
-  "my_own_field": "test",
+  "my_own_field": "test0",
   "my_own_field2": "test2",
   "event_date":"2019-09-01",
   "comment": "Juvenile"
@@ -54,7 +54,7 @@ let fieldwork = [{
   "species": "fulmarus glacialis",
   "species_identification": "79",
   "label_name": "4566432",
-  "my_own_field": "test",
+  "my_own_field": "test1",
   "my_own_field2": "test2",
   "event_date":"2019-01-01",
   "comment": ""
@@ -210,58 +210,67 @@ for (let j of fieldwork) {
            }
        }
 
+  //Fetch all values from the chosen column.
+  //Used as selections in the autocomplete list for that column
+  function  fetch_all_values(id_col) {
+       let val;
+       let arr = [];
+       let data_col = table.columns(id_col).data()[0];
+       for (let i=0;i<data_col.length;i++){
+          val = data_col[i].split('value="')[1].split('"')[0];
+          arr.push(val);
+       };
+       return [...new Set(arr)];
+  }
+
 
     table.on( 'key', function ( e, datatable, key, cell, originalEvent ) {
             //Check if field use autocomplete
             let id_col = cell.index().column;
             let id = obj.template[id_col-1] + "_" + cell.index().row;
             if ((obj.autocompletes).includes(obj.template[id_col-1])){
-               //Remove old list
-               console.log("autocomplete " + id);
-              // console.log(originalEvent.originalEvent.keyCode);
+
+              // Get keycode: originalEvent.originalEvent.keyCode);
                let input_field = document.getElementById(obj.template[id_col-1]+"_"+cell.index().row);
                var a, b, i, val = input_field.value;
-               let arr = template;
-    /*close any already open lists of autocompleted values*/
-    closeAllLists(cell);
+
+               let arr = fetch_all_values(id_col);
+               //close any already open lists of autocompleted values
+               closeAllLists(cell);
 
     if (!val) { return false;}
     currentFocus = -1;
-    /*create a DIV element that will contain the items (values):*/
+    //create a DIV element that will contain the items (values)
     a = document.createElement("DIV");
     a.setAttribute("id", input_field.id + "autocomplete-list");
     a.setAttribute("class", "autocomplete-items");
-    console.log(a);
-    /*append the DIV element as a child of the autocomplete container:*/
+
+    //append the DIV element as a child of the autocomplete container
     input_field.parentNode.appendChild(a);
-    /*for each item in the array...*/
+    //for each item in the array..
     for (i = 0; i < arr.length; i++) {
-      /*check if the item starts with the same letters as the text field value:*/
+      //check if the item starts with the same letters as the text field value
       if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-        /*create a DIV element for each matching element:*/
+        //create a DIV element for each matching element
         b = document.createElement("DIV");
-        /*make the matching letters bold:*/
+        //make the matching letters bold
         b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
         b.innerHTML += arr[i].substr(val.length);
-        /*insert a input field that will hold the current array item's value:*/
+        //insert a input field that will hold the current array item's value
         b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-        /*execute a function when someone clicks on the item value (DIV element):*/
+        //execute a function when someone clicks on the item value (DIV element)
            b.addEventListener("click", function(e) {
-           /*insert the value for the autocomplete text field:*/
+           //insert the value for the autocomplete text field
            input_field.value = this.getElementsByTagName("input")[0].value;
-           /*close the list of autocompleted values,
-           (or any other open lists of autocompleted values:*/
+           //Close the list of autocompleted values,(or any other open lists)
            closeAllLists(cell);
        });
        a.appendChild(b);
      }
    }
 
-
-             }
+     }
     } );
-
-
 
       //On leave - update data
       table.on( 'key-blur', function ( e, datatable, cell ) {
@@ -289,7 +298,6 @@ for (let j of fieldwork) {
               let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
               let text = table.$('input#'+temp)[0].value;
               let input_type = table.$('input#'+temp)[0].type;
-              console.log(input_type);
               //Get old row data from input
               let rowData = datatable.row( cell.index().row ).data();
               //Create new data and update table
@@ -332,31 +340,12 @@ for (let j of fieldwork) {
                return false;
        } );
 
-       //Update the last row edited
-       var update_last_row = (dt, old_index) => {
-         //Get new values
-         let row_content = dt.row( old_index ).node().innerHTML;
-
-         //Change a long text string HTML style into an div array
-         //Only with node() we can get the updated value.
-         let row_content2 = row_content.replace(/<\/td>/g,"</td>,").split(",");
-         row_content2.splice(-1,1);
-
-         //Draw (publish) array
-         let rowNode = table.row(old_index).data(row_content2).draw(false);
-       }
 
        $('#saveBtn').click( function() {
 
-      //   remove_select_menu("sel");
       //    let sel_row = table.row({ selected: true }).nodes();
-      //    console.log(sel_row);
-      //    update_last_row(sel_row, sel_row.index);
-      //     var data = table.$('input, select').serialize();
-
             var data = table.$('input, select').serialize();
-          //let data = table.data();
-          //console.log(data);
+
           var nodes = table.nodes();
           console.log(nodes);
           return false;
