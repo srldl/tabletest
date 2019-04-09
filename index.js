@@ -128,9 +128,11 @@ var checkHtmlComponent = (text,k) => {
       return implement_select(k,index_count,text);
   } else if (obj.datefields.includes(k)) {
       return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="date" id="'+ k +'_'+(index_count).toString()+'" class="dateelement" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></td>';
+  } else if (obj.autocompletes.includes(k)){
+      return '<td id="'+ k +'_'+(index_count).toString()+'"><div class="autocomplete"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></div></td>';
   } else {
       //This is an input element
-      return '<td id="'+ k +'_'+(index_count).toString()+'"><div class="autocomplete" ><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></div></td>';
+      return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></td>';
   }
 }
 

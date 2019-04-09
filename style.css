@@ -5,11 +5,6 @@
   display: inline-block;
 }
 
-input[type=text] {
-  width: 100%;
-}
-
-
 .autocomplete-items div {
   padding: 10px;
   cursor: pointer;
