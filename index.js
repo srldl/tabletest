@@ -302,6 +302,10 @@ for (let j of fieldwork) {
               let rowData = datatable.row( cell.index().row ).data();
               //Create new data and update table
               rowData[cell[0][0].column]='<td id="'+ temp +'"><input type="'+ input_type +'" id="'+ temp +'"value="'+ text+'"></td>';
+              //If it is an autocomplete field, we need an additional div tag
+              if (obj.autocompletes.includes(template[parseInt(cell.index().column) - 1])){
+                 rowData[cell[0][0].column]= '<div class="autocomplete">'  + rowData[cell[0][0].column] + '</div>';
+              };
               let rowNode = table.row(cell.index().row).data(rowData).draw(false);
         }
 
