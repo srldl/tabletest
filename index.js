@@ -223,7 +223,7 @@ for (let j of fieldwork) {
                var a, b, i, val = input_field.value;
                let arr = template;
     /*close any already open lists of autocompleted values*/
-    //closeAllLists(cell);
+    closeAllLists(cell);
 
     if (!val) { return false;}
     currentFocus = -1;
@@ -284,42 +284,20 @@ for (let j of fieldwork) {
               sel_row[id_col+1] = implement_select(obj.template[id_col],cell.index().row,text);
               let rowNode = table.row(cell.index().row).data(sel_row).draw(false);
         } else if (table.$('input')){
+
               //Get cell id
               let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
               let text = table.$('input#'+temp)[0].value;
+              let input_type = table.$('input#'+temp)[0].type;
+              console.log(input_type);
               //Get old row data from input
               let rowData = datatable.row( cell.index().row ).data();
               //Create new data and update table
-              rowData[cell[0][0].column]='<td id="'+ temp +'"><input type="text" id="'+ temp +'"value="'+ text+'"></td>';
+              rowData[cell[0][0].column]='<td id="'+ temp +'"><input type="'+ input_type +'" id="'+ temp +'"value="'+ text+'"></td>';
               let rowNode = table.row(cell.index().row).data(rowData).draw(false);
         }
+
       });
-
-      let index = 0;
-      let old_index = 0;
-      //Autocomplete for predesignated fields
-       var autocomplete = (id) => {
-         if (document.getElementById(id) !== null) {
-            console.log("autocomplete");
-            let sel_col = [];
-            //Get the name of the column
-            let name = id.slice(0, (id.lastIndexOf("_")) );
-            //Use the  column name to find the column index
-            let col_num = Object.keys(template).find(key => template[key] === name);
-            //Get all column data
-            let col = table.column(parseInt(col_num)+1).select().data();
-
-            for (var index = 0; index < col.length; index++) {
-                //Extract the values and add them to sel_col array
-                sel_col.push(col[index].replace(/<\/*div[^>]*>/g,""));
-            }
-
-
-            //Extract all values from the selected column and try autocomplete
-
-         }
-       }
-
 
 
        $('#copyBtn').click( function() {
@@ -437,13 +415,11 @@ for (let j of fieldwork) {
            }
 
            function closeAllLists(cell,elmnt) {
-             console.log(elmnt);
            /*close all autocomplete lists in the document,
            except the one passed as an argument:*/
            let input_field = document.getElementById(obj.template[cell.index().column-1]+"_"+cell.index().row);
            var x = document.getElementsByClassName("autocomplete-items");
            for (var i = 0; i < x.length; i++) {
-              console.log(input_field);
               if (elmnt != x[i] && elmnt != input_field) {
               x[i].parentNode.removeChild(x[i]);
             }
