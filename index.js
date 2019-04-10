@@ -126,7 +126,8 @@ var checkHtmlComponent = (text,k) => {
   //if this is a select element, call implement_select to get the select component
   if (obj.selectlist.hasOwnProperty(k)) {
       return implement_select(k,index_count,text);
-  } else if (obj.datefields.includes(k)) {
+  } else
+   if (obj.datefields.includes(k)) {
       return '<td id="'+ k +'_'+(index_count).toString()+'"><input type="date" id="'+ k +'_'+(index_count).toString()+'" class="dateelement" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></td>';
   } else if (obj.autocompletes.includes(k)){
       return '<td id="'+ k +'_'+(index_count).toString()+'"><div class="autocomplete"><input type="text" id="'+ k +'_'+(index_count).toString()+'" name="'+ k +'_'+(index_count).toString() +'" value="'+ text+'"></div></td>';
@@ -155,9 +156,6 @@ for (let j of fieldwork) {
   for (let value of template) {
     columnsArr.push({ 'title': value });
   }
-
-
-
 
 
     let table;
@@ -272,6 +270,18 @@ for (let j of fieldwork) {
      }
     } );
 
+    table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
+        //Get row
+        var row = dt.row( cell.index().row ).node();
+        if ( $(row).hasClass('selected') ) {
+              // deselect
+              return false;
+
+        }  //else {
+            //   console.log("select");
+        //}
+    });
+
       //On leave - update data
       table.on( 'key-blur', function ( e, datatable, cell ) {
         console.log('key-blur');
@@ -348,7 +358,10 @@ for (let j of fieldwork) {
        $('#saveBtn').click( function() {
 
       //    let sel_row = table.row({ selected: true }).nodes();
-            var data = table.$('input, select').serialize();
+        //    var data = table.$('input, select').serialize()
+                //        data.substr( 0, 120 )+'...'
+        //    let pp =  table.$(':contains("feather")');
+        //    console.log(pp);
 
           var nodes = table.nodes();
           console.log(nodes);
