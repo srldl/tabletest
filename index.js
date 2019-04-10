@@ -221,14 +221,14 @@ for (let j of fieldwork) {
        return [...new Set(arr)];
   }
 
-
+    //Event key selected
     table.on( 'key', function ( e, datatable, key, cell, originalEvent ) {
             //Check if field use autocomplete
             let id_col = cell.index().column;
             let id = obj.template[id_col-1] + "_" + cell.index().row;
             if ((obj.autocompletes).includes(obj.template[id_col-1])){
 
-              // Get keycode: originalEvent.originalEvent.keyCode);
+               // Get keycode: originalEvent.originalEvent.keyCode;
                let input_field = document.getElementById(obj.template[id_col-1]+"_"+cell.index().row);
                var a, b, i, val = input_field.value;
 
@@ -236,55 +236,58 @@ for (let j of fieldwork) {
                //close any already open lists of autocompleted values
                closeAllLists(cell);
 
-    if (!val) { return false;}
-    currentFocus = -1;
-    //create a DIV element that will contain the items (values)
-    a = document.createElement("DIV");
-    a.setAttribute("id", input_field.id + "autocomplete-list");
-    a.setAttribute("class", "autocomplete-items");
+                if (!val) { return false;}
+                currentFocus = -1;
+                //create a DIV element that will contain the items (values)
+                a = document.createElement("DIV");
+                a.setAttribute("id", input_field.id + "autocomplete-list");
+                a.setAttribute("class", "autocomplete-items");
 
-    //append the DIV element as a child of the autocomplete container
-    input_field.parentNode.appendChild(a);
-    //for each item in the array..
-    for (i = 0; i < arr.length; i++) {
-      //check if the item starts with the same letters as the text field value
-      if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-        //create a DIV element for each matching element
-        b = document.createElement("DIV");
-        //make the matching letters bold
-        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-        b.innerHTML += arr[i].substr(val.length);
-        //insert a input field that will hold the current array item's value
-        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-        //execute a function when someone clicks on the item value (DIV element)
-           b.addEventListener("click", function(e) {
-           //insert the value for the autocomplete text field
-           input_field.value = this.getElementsByTagName("input")[0].value;
-           //Close the list of autocompleted values,(or any other open lists)
-           closeAllLists(cell);
-       });
-       a.appendChild(b);
-     }
-   }
+                //append the DIV element as a child of the autocomplete container
+                input_field.parentNode.appendChild(a);
+                //for each item in the array..
+                for (i = 0; i < arr.length; i++) {
+                  //check if the item starts with the same letters as the text field value
+                  if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    //create a DIV element for each matching element
+                    b = document.createElement("DIV");
+                    //make the matching letters bold
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    //insert a input field that will hold the current array item's value
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    //execute a function when someone clicks on the item value (DIV element)
+                       b.addEventListener("click", function(e) {
+                       //insert the value for the autocomplete text field
+                       input_field.value = this.getElementsByTagName("input")[0].value;
+                       //Close the list of autocompleted values,(or any other open lists)
+                       closeAllLists(cell);
+                   });
+                   a.appendChild(b);
+                 }
+               }
 
-     }
+           }
     } );
 
+    //Control the row selected , stay selected if same row focused,
+    //move to another row if focus change
     table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
         //Get row
         var row = dt.row( cell.index().row ).node();
+        //Set focus again after blur update in key-blur
+        let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
+        document.getElementById(temp).focus();
+
+        //Keep focus if row has not changed
         if ( $(row).hasClass('selected') ) {
               // deselect
               return false;
-
-        }  //else {
-            //   console.log("select");
-        //}
+        }
     });
 
       //On leave - update data
       table.on( 'key-blur', function ( e, datatable, cell ) {
-        console.log('key-blur');
         //Close all open lists
         closeAllLists(cell);
         //Get column header (id_col)
@@ -301,7 +304,7 @@ for (let j of fieldwork) {
               let sel_row = table.row(cell.index().row).data();
               //Update cell with changed select menu
               sel_row[id_col+1] = implement_select(obj.template[id_col],cell.index().row,text);
-              let rowNode = table.row(cell.index().row).data(sel_row).draw(false);
+            //  let rowNode = table.row(cell.index().row).data(sel_row).draw(false);
         } else if (table.$('input')){
 
               //Get cell id
@@ -317,6 +320,7 @@ for (let j of fieldwork) {
                  rowData[cell[0][0].column]= '<div class="autocomplete">'  + rowData[cell[0][0].column] + '</div>';
               };
               let rowNode = table.row(cell.index().row).data(rowData).draw(false);
+
         }
 
       });
