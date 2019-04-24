@@ -275,6 +275,7 @@ for (let j of fieldwork) {
     table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
         //Get row
         var row = dt.row( cell.index().row ).node();
+
         //Set focus again after blur update in key-blur
         let temp = template[parseInt(cell.index().column) - 1] + "_" + cell.index().row;
         document.getElementById(temp).focus();
@@ -360,6 +361,7 @@ for (let j of fieldwork) {
 
 
        $('#saveBtn').click( function() {
+        //  let ret = {};
 
       //    let sel_row = table.row({ selected: true }).nodes();
         //    var data = table.$('input, select').serialize()
@@ -367,8 +369,16 @@ for (let j of fieldwork) {
         //    let pp =  table.$(':contains("feather")');
         //    console.log(pp);
 
+      //      console.log(table.row(1).data());
+      /*   for (let i=0;i<template.length;i++){
+            ret.template[i] =
+         } */
+
           var nodes = table.nodes();
           console.log(nodes);
+
+          obj.saveJson = {"san":"llll"};
+          console.log(obj);
           return false;
        } );
 
