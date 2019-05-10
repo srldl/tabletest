@@ -361,23 +361,34 @@ for (let j of fieldwork) {
 
 
        $('#saveBtn').click( function() {
-        //  let ret = {};
+           let nodes = table.nodes()[0].childNodes[1].childNodes;
+           let saveJson = [];
+           let saveRow;
+           let key = "test";
+          for (let i=0;i<nodes.length;i++){
+             saveRow = {};
+             for (let j=1;j<nodes[i].childNodes.length;j++){
 
-      //    let sel_row = table.row({ selected: true }).nodes();
-        //    var data = table.$('input, select').serialize()
-                //        data.substr( 0, 120 )+'...'
-        //    let pp =  table.$(':contains("feather")');
-        //    console.log(pp);
+                switch(nodes[i].childNodes[j].childNodes[0].nodeName){
+                  case 'SELECT':
+                     let ind = nodes[i].childNodes[j].childNodes[0].selectedIndex;
+                     saveRow.mm = nodes[i].childNodes[j].childNodes[0][ind].value;
+                     break;
+                  case 'INPUT':
+                     saveRow.jj =  nodes[i].childNodes[j].childNodes[0].value;
+                     break;
+                  case 'DIV':
+                     saveRow.pp =  nodes[i].childNodes[j].childNodes[0].childNodes[0].value;
+                     break;
+                  default: //#text:
+                     saveRow.uu =  nodes[i].childNodes[j].childNodes[0].data;
+                }
+                console.log(nodes[i].childNodes[j].childNodes[0]);
+                saveJson.push(saveRow);
+             }
+          };
 
-      //      console.log(table.row(1).data());
-      /*   for (let i=0;i<template.length;i++){
-            ret.template[i] =
-         } */
-
-          var nodes = table.nodes();
-          console.log(nodes);
-
-          obj.saveJson = {"san":"llll"};
+          obj.saveJson = saveJson;
           console.log(obj);
           return false;
        } );
@@ -428,7 +439,7 @@ for (let j of fieldwork) {
            }
 
            function removeActive(x) {
-           /*a function to remove the "active" class from all autocomplete items:*/
+           /*A function to remove the "active" class from all autocomplete items:*/
            for (var i = 0; i < x.length; i++) {
             x[i].classList.remove("autocomplete-active");
            }
