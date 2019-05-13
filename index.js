@@ -362,9 +362,11 @@ for (let j of fieldwork) {
 
        $('#saveBtn').click( function() {
            let nodes = table.nodes()[0].childNodes[1].childNodes;
+           console.log(nodes);
            let saveJson = [];
            let saveRow;
            let key = "test";
+           let val;
           for (let i=0;i<nodes.length;i++){
              saveRow = {};
              for (let j=1;j<nodes[i].childNodes.length;j++){
@@ -372,20 +374,19 @@ for (let j of fieldwork) {
                 switch(nodes[i].childNodes[j].childNodes[0].nodeName){
                   case 'SELECT':
                      let ind = nodes[i].childNodes[j].childNodes[0].selectedIndex;
-                     saveRow.mm = nodes[i].childNodes[j].childNodes[0][ind].value;
+                     saveRow[template[j-1]] = nodes[i].childNodes[j].childNodes[0][ind].value;
                      break;
                   case 'INPUT':
-                     saveRow.jj =  nodes[i].childNodes[j].childNodes[0].value;
+                     saveRow[template[j-1]] =  nodes[i].childNodes[j].childNodes[0].value;
                      break;
                   case 'DIV':
-                     saveRow.pp =  nodes[i].childNodes[j].childNodes[0].childNodes[0].value;
+                     saveRow[template[j-1]] =  nodes[i].childNodes[j].childNodes[0].childNodes[0].value;
                      break;
                   default: //#text:
-                     saveRow.uu =  nodes[i].childNodes[j].childNodes[0].data;
+                     saveRow[template[j-1]] =   nodes[i].childNodes[j].childNodes[0].data;
                 }
-                console.log(nodes[i].childNodes[j].childNodes[0]);
-                saveJson.push(saveRow);
              }
+             saveJson.push(saveRow);
           };
 
           obj.saveJson = saveJson;
