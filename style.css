@@ -1,4 +1,9 @@
 
+table1 {
+  table-layout: auto;
+ width: 100%;
+}
+
 .autocomplete {
   /*the container must be positioned relative:*/
   position: relative;
