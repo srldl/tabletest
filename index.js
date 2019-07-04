@@ -12,8 +12,9 @@ let obj =  {  "dataRows": dataRows,
               "id": "exceltable"
 };
 
+
 //This counter holds the selected row
-let row_selected = 0;
+/*let row_selected = 0;
 //This counter holds the row length
 let row_length = obj.headers.length + 2;
 //This counter holds next row_number
@@ -144,4 +145,4 @@ let newRow = function (container,dataRows,id,readOnly=false){
  //Add rows from database
  for (let j=0;j<dataRows.length;j++){
      newRow(container,obj.dataRows[j], obj.id);
- }
+ } */
