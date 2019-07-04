@@ -4,7 +4,7 @@
 let dataRows=[["A","AA","2019-06-14T12:00:00Z"],["B","BB","2019-06-14T12:00:00Z"]];
 
 //Create object with input parameters
-let obj =  {  "dataRows": dataRows,
+let obj =  {  "dataRows": [], //dataRows,
               "headers": ["project", "subproject", "event_date"],
               "selectlist": {"project":["A","B","C"]},
               "autocompletes": ["subproject"],
@@ -28,6 +28,16 @@ function input_element(id_td,id,inputValue,readOnly,backgroundColor,borderColor,
   return td;
 }
 
+/* Create a new row */
+function new_row(row,no_columns){
+  let tr1 = document.createElement("tr");
+  for (let j=0;j<no_columns;j++){
+    let input1 = input_element('cell_'+row+'_'+j,'input_'+row+'_'+j,'',false,'white','white','normal','100%');
+    tr1.appendChild(input1);
+ }
+ return tr1;
+}
+
 function th_element(id,textContent){
   let th = document.createElement("th");
   th.id = id;
@@ -35,26 +45,27 @@ function th_element(id,textContent){
   return th;
 }
 
+  //Create header
   let container_header = document.getElementById("header1");
-  let th1 = th_element("header_1","Foobar1");
-  let th2 = th_element("header_1","Foobar2");
-  container_header.appendChild(th1);
-  container_header.appendChild(th2);
+  for (let i=0;i<obj.headers.length;i++){
+      let th = th_element("header_"+ i,obj.headers[i]);
+      container_header.appendChild(th);
+  }
 
+  //Insert values into table
   let container = document.getElementById("tbody1");
-  let tr1 = document.createElement("tr");
-  let input1 = input_element('cell_1_1','input_1_1','Foobar11',false,'white','white','normal','100%');
-  let input2 = input_element('cell_1_2','input_1_2','Foobar21',false,'white','white','normal','100%');
-  tr1.appendChild(input1);
-  tr1.appendChild(input2);
-  container.appendChild(tr1);
+  //Applies if obj.dataRows (saved rows) is empty
+  if (obj.dataRows === undefined || obj.dataRows.length === 0) {
+    let tr1 = new_row(2,obj.headers.length);
+    container.appendChild(tr1);
+  }
 
-/*  var table = document.createElement("table");
-  container.appendChild(table);
-  var thead = document.createElement("thead");
-  container.appendChild(thead);
-  var tr = document.createElement("tr");
-  container.appendChild(tr);
-  var th = document.createElement("th");
-  th.value = "ttt";
-  container.appendChild(th); */
+  //This only applies if obj.dataRow (saved rows) is not empty, otherwise it generates nothing
+  for (let k=0;k<obj.dataRows.length;k++){
+       let tr1 = document.createElement("tr");
+       for (let j=0;j<obj.dataRows[0].length;j++){
+          let input1 = input_element('cell_'+k+'_'+j,'input_'+k+'_'+j,obj.dataRows[k][j],false,'white','white','normal','100%');
+          tr1.appendChild(input1);
+       }
+       container.appendChild(tr1);
+  }
