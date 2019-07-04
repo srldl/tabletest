@@ -12,137 +12,41 @@ let obj =  {  "dataRows": dataRows,
               "id": "exceltable"
 };
 
-
-//This counter holds the selected row
-/*let row_selected = 0;
-//This counter holds the row length
-let row_length = obj.headers.length + 2;
-//This counter holds next row_number
-let index_count = 0;
-
-function increment_index_count(count){
-   for (let i=0;i<count;i++){
-      index_count++;
-   }
+function input_element(id,inputValue,readOnly,backgroundColor,borderColor,fontWeight,fontSize){
+  var input = document.createElement("input");
+  input.type = "text";
+  input.id = id;
+  input.value= inputValue;
+  input.readOnly = readOnly;
+  input.style.backgroundColor = backgroundColor;
+  input.style.borderColor = borderColor;
+  input.style.fontWeight = fontWeight;
+  input.style.fontSize = fontSize;
+  return input;
 }
 
-
-
-let handleKeyDown = function (event) {
-    // do something!
-    console.log('keyDown');
-    console.log(event);
-};
-
-//Set cell and row select
-let handleClick = function (event) {
-    //1)Get row
-    let elem = document.getElementById(event.explicitOriginalTarget.id);
-    let id_arr = (elem.id).split('_');
-
-    //2) Remove colors all other rows
-    for (let j=1;j<index_count;j++){
-      for (let i=0;i<row_length-2;i++){
-         document.getElementById(id_arr[0]+"_"+j+"_"+i).style.backgroundColor = "#ffffff";
-      }
-    }
-    //3)Set color
-    for (let k=0;k<row_length-2;k++){
-         document.getElementById(id_arr[0]+"_"+id_arr[1]+"_"+k).style.backgroundColor = "#f0def2";
-    }
-    elem.style.borderColor = "blue";
-};
-
-// new button pressed
-let newBtn = function (event) {
-    console.log('newBtn');
-};
-
-// copy button pressed
-let copyBtn = function (event) {
-    console.log('copyBtn');
-};
-
-// save button pressed
-let delBtn = function (event) {
-    console.log('delBtn');
-};
-
-// save button pressed
-let saveBtn = function (event) {
-    console.log('saveBtn');
-    container = document.getElementById("table1");
-    console.log(container);
-    console.log(container.childNodes[4].value);
-};
-
-//This is first column with a running count
-let count_col = function () {
-     var input = document.createElement("input");
-     input.type = "text";
-     input.id = "counter_" + index_count;
-     input.value = index_count;
-     input.size = 4;  //Create a small field
-     index_count === 0 ? input.value = "count" : input.value = index_count;
-          input.readOnly = true;
-     container.appendChild(input);
+function th_element(id,textContent){
+  let th = document.createElement("th");
+  th.id = id;
+  th.textContent = textContent;
+  return th;
 }
 
-//This is last column with a running id
-let id_col = function (id, col) {
-     var input = document.createElement("input");
-     input.type = "text";
-     input.id = "cell_" + index_count + "_" + col;
-     index_count === 0 ? input.value = "id" : input.value = id +"-"+ index_count;
-     input.readOnly = true;
-     container.appendChild(input);
-}
+  let container = document.getElementById("header1");
+  let th1 = th_element("header_1","Foobar1");
+  let th2 = th_element("header_1","Foobar2");
 
+  let input = input_element('header_1','Foobar',true,'lightsteelblue','lightsteelblue','bold','120%');
+  container.appendChild(th1);
+  container.appendChild(th2);
+  //container.appendChild(th);
 
-//Lay out the next row
-let newRow = function (container,dataRows,id,readOnly=false){
-
-    //First column
-    count_col();
-
-    for (let col=0;col<row_length-2;col++){
-                // Append a node with a random text
-                //container.appendChild(document.createTextNode("Member " + (row+1)));
-
-                // Create an <input> element, set its type and name attributes
-                var input = document.createElement("input");
-                input.type = "text";
-                input.id = "cell_" + index_count + "_" + col;
-                input.value = dataRows[col];
-                //If heading,rowno or id, make it non-changeable
-                if (readOnly) {
-                  input.readOnly = true;
-                }
-                container.appendChild(input);
-    }
-
-     //Add id to the row as the last column
-     id_col(id,row_length-1);
-     // Append a line break
-     container.appendChild(document.createElement("br"));
-     increment_index_count(1);
-
-};
-
-
- var container = document.getElementById("table1");
- //Autocomplete
- container.addEventListener('keydown', handleKeyDown);
- //Select row
- container.addEventListener('click', handleClick);
- document.getElementById("newBtn").addEventListener('click', newBtn);
- document.getElementById("copyBtn").addEventListener('click', copyBtn);
- document.getElementById("delBtn").addEventListener('click', delBtn);
- document.getElementById("saveBtn").addEventListener('click', saveBtn);
-
- //Add headers
- newRow(container,obj.headers, obj.id, true);
- //Add rows from database
- for (let j=0;j<dataRows.length;j++){
-     newRow(container,obj.dataRows[j], obj.id);
- } */
+/*  var table = document.createElement("table");
+  container.appendChild(table);
+  var thead = document.createElement("thead");
+  container.appendChild(thead);
+  var tr = document.createElement("tr");
+  container.appendChild(tr);
+  var th = document.createElement("th");
+  th.value = "ttt";
+  container.appendChild(th); */

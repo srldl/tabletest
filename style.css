@@ -1,3 +1,5 @@
+
+
 /* Display table with vertical scroll */
 table {
     border-collapse: collapse;
@@ -19,6 +21,13 @@ td {
     height: 25px;
 }
 
+/* Top most "Add rows" element */
+input#addRows{
+  width:30px;
+  height: 25px;
+  border-color:black;
+}
+
 /* Inputs in table */
 input {
     border: 1px solid white;
@@ -28,9 +37,4 @@ input {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
-}
-
-/* Top most "Add rows" element */
-input#addRows{
-  width:30px;
 }
