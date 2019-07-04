@@ -1,12 +1,11 @@
 /* Display table with vertical scroll */
-/*div#table2 {
+table {
     border-collapse: collapse;
-    max-height: 400px;
-    overflow-y: scroll;
-} */
+}
 
 /* Table heading */
-thead.head {
+thead {
+   border: 1px solid black;
    background-color: lightsteelblue;
    position: sticky;
    top: 0;
@@ -17,5 +16,21 @@ thead.head {
 td {
     border: 1px solid steelblue;
     width: 200px;
-    height: 30px;
+    height: 25px;
+}
+
+/* Inputs in table */
+input {
+    border: 1px solid white;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+/* Top most "Add rows" element */
+input#addRows{
+  width:30px;
 }
