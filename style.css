@@ -32,9 +32,9 @@ input#addRows{
 input {
     border: 1px solid white;
   width: 100%;
-  padding: 0px;
-  margin: 0px;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }

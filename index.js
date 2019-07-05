@@ -13,6 +13,13 @@ let obj =  {  "dataRows": dataRows,
               "id": "exceltable"
 };
 
+//Table width
+let col_length = obj.headers.length;
+//This counter holds next row_number
+let row_length = 0;
+
+
+
 function input_element(id_td,id,inputValue,readOnly,backgroundColor,borderColor,fontWeight,fontSize){
   var td = document.createElement("td");
   td.id = id_td;
@@ -36,6 +43,7 @@ function new_row(row,no_columns){
     let input1 = input_element('cell_'+row+'_'+j,'input_'+row+'_'+j,'',false,'white','white','normal','100%');
     tr1.appendChild(input1);
  }
+ row_length++;
  return tr1;
 }
 
@@ -69,17 +77,45 @@ function th_element(id,textContent, textTooltip){
           let input1 = input_element('cell_'+k+'_'+j,'input_'+k+'_'+j,obj.dataRows[k][j],false,'white','white','normal','100%');
           tr1.appendChild(input1);
        }
+       row_length++;
        container.appendChild(tr1);
   }
 
-/*  document.getElementById("header_1").onmouseover = function()
-  {
-    this.style.backgroundColor = "pink";
-    console.log(this);
-  }
+  // This function checks if an arrow key has been pressed
+  // If so, it changes focus
+  function checkKey(e) {
+  e = e || window.event;
+  let pos = document.activeElement.id.split("_");
+//  let pos = active_cell.id.split("_");
+  let row = parseInt(pos[1]);
+  let col = parseInt(pos[2]);
 
-  document.getElementById("header_1").onmouseout = function()
-  {
-    this.style.backgroundColor = "green";
-    console.log(this);
-  } */
+  if (e.keyCode == '38') {
+    // up arrow
+    if (row > -1) {
+         let elem = document.getElementById("input_"+(row-1).toString()+"_"+pos[2]);
+         elem.select();
+    }
+  } else if (e.keyCode == '40') {
+    // down arrow
+    if (row < row_length+1) {
+         let elem = document.getElementById("input_"+(row+1).toString()+"_"+pos[2]);
+         elem.select();
+    }
+  } /*else if (e.keyCode == '37') {
+    // left arrow
+    if  (col > -1) {
+         let elem = document.getElementById("input_"+pos[1]+"_"+(col-1).toString());
+         elem.select();
+    }
+  } else if (e.keyCode == '39') {
+    // right arrow
+    if (col < col_length+1) {
+      //   let elem = document.getElementById("input_"+pos[1]+"_"+(col+1).toString());
+         console.log(elem);
+         elem.select();
+    }
+  }*/
+}
+
+  document.onkeydown = checkKey;
