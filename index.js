@@ -1,11 +1,12 @@
 'use strict';
 
 //the rows
-let dataRows=[["A","AA","2019-06-14T12:00:00Z"],["B","BB","2019-06-14T12:00:00Z"]];
+let dataRows=[["A","AA","2019-06-14T12:00:00Z"],["B","BB","2019-06-13T12:00:00Z"],["C","CC","2019-06-14T12:00:00Z"]];
 
 //Create object with input parameters
-let obj =  {  "dataRows": [], //dataRows,
+let obj =  {  "dataRows": dataRows,
               "headers": ["project", "subproject", "event_date"],
+              "headers_tooltip": ["project letter","subproject letters","start date of work"],
               "selectlist": {"project":["A","B","C"]},
               "autocompletes": ["subproject"],
               "dateFields":["event_date"],
@@ -38,9 +39,10 @@ function new_row(row,no_columns){
  return tr1;
 }
 
-function th_element(id,textContent){
+function th_element(id,textContent, textTooltip){
   let th = document.createElement("th");
   th.id = id;
+  th.title = textTooltip;
   th.textContent = textContent;
   return th;
 }
@@ -48,7 +50,7 @@ function th_element(id,textContent){
   //Create header
   let container_header = document.getElementById("header1");
   for (let i=0;i<obj.headers.length;i++){
-      let th = th_element("header_"+ i,obj.headers[i]);
+      let th = th_element("header_"+ i,obj.headers[i],obj.headers_tooltip[i]);
       container_header.appendChild(th);
   }
 
@@ -69,3 +71,15 @@ function th_element(id,textContent){
        }
        container.appendChild(tr1);
   }
+
+/*  document.getElementById("header_1").onmouseover = function()
+  {
+    this.style.backgroundColor = "pink";
+    console.log(this);
+  }
+
+  document.getElementById("header_1").onmouseout = function()
+  {
+    this.style.backgroundColor = "green";
+    console.log(this);
+  } */
