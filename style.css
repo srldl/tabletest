@@ -1,5 +1,6 @@
 
 
+
 /* Display table with vertical scroll */
 table {
     border-collapse: collapse;
@@ -38,3 +39,7 @@ input {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 }
+
+.selectCell { border: thick solid #0000FF; }
+
+.dragCell { border: thick dotted #0000AA; }
