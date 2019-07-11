@@ -162,7 +162,6 @@ document.addEventListener("dragover", function( event ) {
      if ((id.startsWith('td'))&&(id !== drag_arr[drag_arr.length-1])) {
        //if user have returned back (regretting), skip last cell
        if (id === drag_arr[drag_arr.length-2]) {
-         //let last_id = drag_arr[drag_arr.length-1];
          //Remove selected border
          document.getElementById(drag_arr[drag_arr.length-1]).classList.remove('dragCell');
          drag_arr.pop();
@@ -217,16 +216,42 @@ let handleClick = function (event) {
 // new button pressed
 let newBtn = function (event) {
     console.log('newBtn');
+    //Get number of new rows wanted
+    let num = addRows();
+    for (let i=0;i<num;i++){
+        let tr = new_row(obj.headers.length+2);
+        container.appendChild(tr);
+    }
 };
 
 // copy button pressed
 let copyBtn = function (event) {
     console.log('copyBtn');
+    if (prev_selected_cell == '') {
+       alert("Please select a row");
+    } else {    //Get the selected row
+       let tr = (document.getElementById(prev_selected_cell)).parentElement;
+       document.getElementById(prev_selected_cell).classList.remove('selectCell');
+       console.log(tr);
+       //Get number of new rows wanted
+       let num = addRows();
+       for (let i=0;i<num;i++){
+            let cln = tr.cloneNode(true);
+            //cln.classList.remove('selectCell');
+            container.appendChild(cln);
+       }
+    }
 };
 
 // save button pressed
 let delBtn = function (event) {
     console.log('delBtn');
+    if (prev_selected_cell == '') {
+       alert("Please select a row");
+    } else {    //Get the selected row
+       let td = (document.getElementById(prev_selected_cell));
+       document.getElementById("tbody1").removeChild(td.parentElement);
+    }
 };
 
 // save button pressed
@@ -236,6 +261,10 @@ let saveBtn = function (event) {
     console.log(container);
 };
 
+//Get the number of wanted new/copied/deleted rows
+function addRows(){
+   return document.getElementById("addRows").value;
+};
 
 document.onkeydown = checkKey;
 container.addEventListener('click', handleClick);
