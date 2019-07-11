@@ -21,6 +21,8 @@ let col_length = obj.headers.length + 2;
 let row_length = 1;
 //Holds the array marked for copy
 let drag_arr = [];
+//The previous selected cell
+let prev_selected_cell = '';
 
 
 
@@ -160,9 +162,9 @@ document.addEventListener("dragover", function( event ) {
      if ((id.startsWith('td'))&&(id !== drag_arr[drag_arr.length-1])) {
        //if user have returned back (regretting), skip last cell
        if (id === drag_arr[drag_arr.length-2]) {
-         let last_id = drag_arr[drag_arr.length-1];
+         //let last_id = drag_arr[drag_arr.length-1];
          //Remove selected border
-         document.getElementById(last_id).classList.remove('dragCell');
+         document.getElementById(drag_arr[drag_arr.length-1]).classList.remove('dragCell');
          drag_arr.pop();
        } else {  //No user regrets, continue dragging
          //Set a border so the user can see the cell is selected
@@ -195,26 +197,15 @@ document.addEventListener("dragover", function( event ) {
  }, false);
 
 
- //Drag and drop & select cell
- //Remove style borders from the whole table
- //Useful when the user selects another cell
- function  remove_borders (){
-   for (let i=1;i<row_length;i++){
-      for (let j=1;j<col_length-1;j++){
-         document.getElementById('td_'+ i + '_' + j).classList.remove('selectCell');
-         document.getElementById('td_'+ i + '_' + j).classList.remove('dragCell');
-      }
-   }
- }
-
-
 //Set cell and row select
 let handleClick = function (event) {
   if ((event.explicitOriginalTarget.id).startsWith('input') || (event.explicitOriginalTarget.id).startsWith('select')) {
       let doc = document.getElementById(event.explicitOriginalTarget.id);
       let elem = doc.parentElement;
       //Remove borders from the whole table
-      remove_borders();
+      if (prev_selected_cell !== '') { document.getElementById(prev_selected_cell).classList.remove('selectCell');};
+       //Update this to be the previous selected cell
+       prev_selected_cell = elem.id;
       //Mark selected cell
       elem.classList.add("selectCell");
       //Make it draggable
