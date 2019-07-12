@@ -40,7 +40,7 @@ input {
     -webkit-box-sizing: border-box;
 }
 
-.selectCell { border: thick solid #0000FF; }
+.selectCell { border: 10px solid #0000FF; }
 
 .dragCell { border: thick dotted #0000AA; }
 

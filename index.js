@@ -147,43 +147,27 @@ function new_count_id (id,innerhtml){
 
   // This function checks if an arrow key has been pressed
   // If so, it changes focus
-  function checkKey(e) {
-  e = e || window.event;
+  function checkKey(event) {
+    console.log(event);
+  event = event || window.event;
   let pos = document.activeElement.id.split("_");
-//  let pos = active_cell.id.split("_");
   let row = parseInt(pos[1]);
   let col = parseInt(pos[2]);
 
-  if (e.keyCode == '38') {
-    // up arrow
-    if (row > -1) {
-         let elem = document.getElementById("input_"+(row-1).toString()+"_"+pos[2]);
-         elem.select();
-    }
-  } else if (e.keyCode == '40') {
-    // down arrow
-    if (row < row_length+1) {
-         let elem = document.getElementById("input_"+(row+1).toString()+"_"+pos[2]);
-         elem.select();
-    }
-  } /*else if (e.keyCode == '37') {
-    // left arrow
-    if  (col > -1) {
-         let elem = document.getElementById("input_"+pos[1]+"_"+(col-1).toString());
-         elem.select();
-    }
-  } else if (e.keyCode == '39') {
-    // right arrow
-    if (col < col_length+1) {
-      //   let elem = document.getElementById("input_"+pos[1]+"_"+(col+1).toString());
-         console.log(elem);
-         elem.select();
-    }
-  }*/
+  if (event.keyCode == '9') {
+    //Tab
+     console.log(prev_selected_cell);
+     console.log(event.target);
+     let prev = document.getElementById(prev_selected_cell);
+      prev.classList.remove('selectCell');
+  } else if (event.shiftKey && event.keyCode == 9) {
+    //Shift+TAB
+    document.getElementById(prev_selected_cell).classList.remove('selectCell');
+  }
 }
 
 //Drag and drop - drag over event
-document.addEventListener("dragover", function( event ) {
+let dragover = function(event){
       let id = event.target.id;
       //Don't copy yet, add id to drag_arr - drag_arr should only contain same values in a row
      if ((id.startsWith('td'))&&(id !== drag_arr[drag_arr.length-1])) {
@@ -199,10 +183,10 @@ document.addEventListener("dragover", function( event ) {
 
        }
      }
- }, false);
+ };
 
  //Drag and drop - end of dragging
- document.addEventListener("dragend", function( event ) {
+let dragend = function(event){
     //If drop_arr last value is equal to first value, skip everything.
     //The user has withdraw the action.
     let drop_value = document.getElementById(event.target.id).childNodes[0].value;
@@ -215,31 +199,29 @@ document.addEventListener("dragover", function( event ) {
     }
     //Reset drag_arr until next drag/drop
     drag_arr = [];
- }, false);
+ };
 
  //Drag and drop - disable drop
- document.addEventListener("drop", function( event ) {
+let drop = function (event) {
    event.preventDefault();
- }, false);
+ };
 
+ //Upon clicking in table
+  let click = function (event) {
+   if ((event.target.id).startsWith('input') || (event.target.id).startsWith('select')) {
+        let doc = document.getElementById(event.target.id);
+       let elem = doc.parentElement;
+       //Remove borders from the whole table
+       if (prev_selected_cell !== '') { document.getElementById(prev_selected_cell).classList.remove('selectCell');};
+        //Update this to be the previous selected cell
+        prev_selected_cell = elem.id;
+       //Mark selected cell
+       elem.classList.add("selectCell");
+       //Make it draggable
+       elem.draggable = "true";
+       elem.ondragstart = addEventListener('dragstart', function(event) { event.dataTransfer.setData('text/plain', doc.value); });
+ }};
 
-//Set cell and row select
-let handleClick = function (event) {
-  console.log(event.explicitOriginalTarget);
-  if ((event.explicitOriginalTarget.id).startsWith('input') || (event.explicitOriginalTarget.id).startsWith('select')) {
-      let doc = document.getElementById(event.explicitOriginalTarget.id);
-      let elem = doc.parentElement;
-      //Remove borders from the whole table
-      if (prev_selected_cell !== '') { document.getElementById(prev_selected_cell).classList.remove('selectCell');};
-       //Update this to be the previous selected cell
-       prev_selected_cell = elem.id;
-      //Mark selected cell
-      elem.classList.add("selectCell");
-      //Make it draggable
-      elem.draggable = "true";
-      elem.ondragstart = addEventListener('dragstart', function(event) { event.dataTransfer.setData('text/plain', doc.value); });
-}
-}
 
 // new button pressed
 let newBtn = function (event) {
@@ -294,8 +276,11 @@ function addRows(){
    return document.getElementById("addRows").value;
 };
 
-document.onkeydown = checkKey;
-container.addEventListener('click', handleClick);
+document.getElementById("tbody1").addEventListener("dragover", dragover);
+document.getElementById("tbody1").addEventListener("dragend", dragend);
+document.getElementById("tbody1").addEventListener("drop", drop);
+document.getElementById("tbody1").addEventListener('keydown', checkKey);
+document.getElementById("tbody1").addEventListener('click', click);
 document.getElementById("newBtn").addEventListener('click', newBtn);
 document.getElementById("copyBtn").addEventListener('click', copyBtn);
 document.getElementById("delBtn").addEventListener('click', delBtn);
