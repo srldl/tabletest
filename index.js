@@ -25,22 +25,39 @@ let drag_arr = [];
 let prev_selected_cell = '';
 
 
+function input_element(id_td,id,inputValue,typefield){
+  var td = document.createElement("td");
+  td.id = id_td;
+  //Child element
+  var input = document.createElement("input");
+  input.type = typefield;
+  input.id = id;
+  input.value= inputValue;
+  td.appendChild(input);
+  return td;
+}
 
-function input_element(id_td,id,inputValue,readOnly,backgroundColor,borderColor,fontWeight,fontSize){
+function select_element(id_td, id_select, header_name, val){
   var td = document.createElement("td");
   td.id = id_td;
 
-  var input = document.createElement("input");
-  input.type = "text";
-  input.id = id;
-  input.value= inputValue;
-  input.readOnly = readOnly;
-  input.style.backgroundColor = backgroundColor;
-  input.style.borderColor = borderColor;
-  input.style.fontWeight = fontWeight;
-  input.style.fontSize = fontSize;
-  td.appendChild(input);
-  return td;
+  //Find the select options from the input object named obj
+  let arr = obj.selectlist[header_name];
+  let returnstring = '';
+  if (arr != undefined) {
+        for (let i in arr) {
+            if (arr[i] === val) {
+              returnstring += "<option value='" + arr[i] + "'selected>" + arr[i] + "</option>";
+            } else {
+              returnstring += "<option value='" + arr[i] + "'>" + arr[i] + "</option>";
+            }
+        }
+    }
+    var select = document.createElement("select");
+    select.id = id_select;
+    select.innerHTML = returnstring;
+    td.appendChild(select);
+    return td;
 }
 
 /* Create a new row */
@@ -50,7 +67,7 @@ function new_row(no_columns){
   tr1.appendChild(new_count_id('count_'+row_length,row_length));
   //User columns
   for (let j=1;j<no_columns-1;j++){
-    let input1 = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,'',false,'white','white','normal','100%');
+    let input1 = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,'','text');
     tr1.appendChild(input1);
   }
   //Id columns
@@ -76,41 +93,51 @@ function new_count_id (id,innerhtml){
     return td0;
 }
 
-  //Create headers:
+  //1. Create headers:
   let container_header = document.getElementById("header1");
 
-  //1. First column is the count
+  //a. First column is the count..
   let th0 = th_element("header_0","no",'');
   container_header.appendChild(th0);
 
-  //2. The next is the user headings
+  //b. ..the next is the user headings..
   for (let i=0;i<obj.headers.length;i++){
       let th = th_element("header_"+ i,obj.headers[i],obj.headers_tooltip[i]);
       container_header.appendChild(th);
   }
 
-  //3. Finally the id header
+  //c. ..finally the id header
   let th_last = th_element("header_"+obj.headers.length,"id",'');
   container_header.appendChild(th_last);
 
-  //Insert values into table body
+  //2.. Insert values into table body
   let container = document.getElementById("tbody1");
 
   //This only applies if obj.dataRows (fetched rows) is empty, otherwise omitted
-  if (obj.dataRows === undefined || obj.dataRows.length === 0) {
-    let tr1 = new_row(obj.headers.length+2);
-    container.appendChild(tr1);
-  }
+//  if (obj.dataRows === undefined || obj.dataRows.length === 0) {
+//    let tr1 = new_row(obj.headers.length+2);
+//    container.appendChild(tr1);
+//  }
 
-  //This only applies if obj.dataRow (fetched rows) is not empty, otherwise it generates nothing
+  //The table body
   for (let k=1;k<(obj.dataRows.length+1);k++){
        let tr1 = document.createElement("tr");
        //First column is the count
        tr1.appendChild(new_count_id("count_"+row_length,row_length));
+       let td;
        //Second to almost last column is user info
        for (let j=1;j<obj.dataRows[0].length+1;j++){
-          let input1 = input_element('td_'+k+'_'+j,'input_'+k+'_'+j,obj.dataRows[k-1][j-1],false,'white','white','normal','100%');
-          tr1.appendChild(input1);
+         if (obj.selectlist.hasOwnProperty(obj.headers[j-1])) {  //Select field
+            td = select_element('td_'+k+'_'+j,'select_'+k+'_'+j,obj.headers[j-1],obj.dataRows[k-1][j-1]);
+
+         } else if (obj.dateFields.includes(obj.headers[j-1])){  //input date field
+             let conv_date = (obj.dataRows[k-1][j-1]).substring(0,10);
+             td = input_element('td_'+k+'_'+j,'input_'+k+'_'+j,conv_date,'date');
+
+         } else {  //ordinary input field
+             td = input_element('td_'+k+'_'+j,'input_'+k+'_'+j,obj.dataRows[k-1][j-1],'text');
+         }
+         tr1.appendChild(td);
        }
        //Last column is the id
        tr1.appendChild(new_count_id("id_"+row_length,obj.id+"-"+row_length));
@@ -198,6 +225,7 @@ document.addEventListener("dragover", function( event ) {
 
 //Set cell and row select
 let handleClick = function (event) {
+  console.log(event.explicitOriginalTarget);
   if ((event.explicitOriginalTarget.id).startsWith('input') || (event.explicitOriginalTarget.id).startsWith('select')) {
       let doc = document.getElementById(event.explicitOriginalTarget.id);
       let elem = doc.parentElement;

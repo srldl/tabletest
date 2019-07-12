@@ -43,3 +43,8 @@ input {
 .selectCell { border: thick solid #0000FF; }
 
 .dragCell { border: thick dotted #0000AA; }
+
+select {
+    border: 0;
+    width: 100%;
+}
