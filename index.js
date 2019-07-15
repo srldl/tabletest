@@ -1,8 +1,8 @@
 'use strict';
 
 //the rows
-let dataRows= [["A","AA","2019-06-14T12:00:00Z"],["B","BB","2019-06-13T12:00:00Z"],
-              ["C","CC","2019-06-14T12:00:00Z"],["D","DD","2019-07-17T12:00:00Z"]];
+let dataRows= []; //  [["A","AA","2019-06-14T12:00:00Z"],["B","BB","2019-06-13T12:00:00Z"],
+              // ["C","CC","2019-06-14T12:00:00Z"],["D","DD","2019-07-17T12:00:00Z"]];
 
 //Create object with input parameters
 let obj =  {  "dataRows": dataRows,
@@ -60,21 +60,6 @@ function select_element(id_td, id_select, header_name, val){
     return td;
 }
 
-/* Create a new row */
-function new_row(no_columns){
-  let tr1 = document.createElement("tr");
-  //Count column
-  tr1.appendChild(new_count_id('count_'+row_length,row_length));
-  //User columns
-  for (let j=1;j<no_columns-1;j++){
-    let input1 = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,'','text');
-    tr1.appendChild(input1);
-  }
-  //Id columns
-  tr1.appendChild(new_count_id('id_'+row_length,obj.id+'-'+row_length));
-  row_length++;
-  return tr1;
-}
 
 //Create header element
 function th_element(id,textContent, textTooltip){
@@ -110,40 +95,43 @@ function new_count_id (id,innerhtml){
   let th_last = th_element("header_"+obj.headers.length,"id",'');
   container_header.appendChild(th_last);
 
-  //2.. Insert values into table body
+  //2. Insert values into table body
   let container = document.getElementById("tbody1");
 
   //This only applies if obj.dataRows (fetched rows) is empty, otherwise omitted
-//  if (obj.dataRows === undefined || obj.dataRows.length === 0) {
-//    let tr1 = new_row(obj.headers.length+2);
-//    container.appendChild(tr1);
-//  }
+  if (obj.dataRows === undefined || obj.dataRows.length === 0) {
+    newRow(1,"");
+  } else {
+    //The table body
+    newRow(obj.dataRows.length,obj.dataRows);
+  }
 
-  //The table body
-  for (let k=1;k<(obj.dataRows.length+1);k++){
-       let tr1 = document.createElement("tr");
+
+/*  for (let k=1;k<(obj.dataRows.length+1);k++){ //
+       let tr = document.createElement("tr");
        //First column is the count
-       tr1.appendChild(new_count_id("count_"+row_length,row_length));
+       tr.appendChild(new_count_id("count_"+row_length,row_length));
        let td;
        //Second to almost last column is user info
-       for (let j=1;j<obj.dataRows[0].length+1;j++){
+       for (let j=1;j<obj.headers.length+1;j++){
+         let row_input = obj.dataRows[k-1][j-1]; //
          if (obj.selectlist.hasOwnProperty(obj.headers[j-1])) {  //Select field
-            td = select_element('td_'+k+'_'+j,'select_'+k+'_'+j,obj.headers[j-1],obj.dataRows[k-1][j-1]);
+            td = select_element('td_'+k+'_'+j,'select_'+k+'_'+j,obj.headers[j-1],row_input);
 
          } else if (obj.dateFields.includes(obj.headers[j-1])){  //input date field
-             let conv_date = (obj.dataRows[k-1][j-1]).substring(0,10);
+             let conv_date = (row_input).substring(0,10); //
              td = input_element('td_'+k+'_'+j,'input_'+k+'_'+j,conv_date,'date');
 
          } else {  //ordinary input field
-             td = input_element('td_'+k+'_'+j,'input_'+k+'_'+j,obj.dataRows[k-1][j-1],'text');
+             td = input_element('td_'+k+'_'+j,'input_'+k+'_'+j,row_input,'text');
          }
-         tr1.appendChild(td);
+         tr.appendChild(td);
        }
        //Last column is the id
-       tr1.appendChild(new_count_id("id_"+row_length,obj.id+"-"+row_length));
+       tr.appendChild(new_count_id("id_"+row_length,obj.id+"-"+row_length));
        row_length++;
-       container.appendChild(tr1);
-  }
+       container.appendChild(tr);
+  }*/
 
   // This function checks if an arrow key has been pressed
   // If so, it changes focus
@@ -228,11 +216,41 @@ let newBtn = function (event) {
     console.log('newBtn');
     //Get number of new rows wanted
     let num = addRows();
-    for (let i=0;i<num;i++){
-        let tr = new_row(obj.headers.length+2);
-        container.appendChild(tr);
-    }
+    newRow(num,"");
 };
+
+//Create the next row
+function newRow(num,input_text){
+//Number of rows
+for (let i=0;i<num;i++){
+    let tr = document.createElement("tr");
+    //Count column
+    tr.appendChild(new_count_id('count_'+row_length,row_length));
+    //Second to almost last column is user info
+    let td;
+    for (let j=1;j<obj.headers.length+1;j++){
+      //Difference between empty row and row with input
+      let inp = (input_text == '') ? '' : (input_text[i][j-1]);
+
+      if (obj.selectlist.hasOwnProperty(obj.headers[j-1])) {  //Select field
+         td = select_element('td_'+row_length+'_'+j,'select_'+row_length+'_'+j,obj.headers[j-1],inp);
+
+      } else if (obj.dateFields.includes(obj.headers[j-1])){  //input date field
+          let date =   (inp == '') ? '' : inp.substring(0,10);
+
+         td = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,date,'date');
+
+      } else {  //ordinary input field
+         td = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,inp,'text');
+      }
+      tr.appendChild(td);
+}
+//Id columns
+tr.appendChild(new_count_id('id_'+row_length,obj.id+'-'+row_length));
+row_length++;
+container.appendChild(tr);
+}
+}
 
 // copy button pressed
 let copyBtn = function (event) {
@@ -273,7 +291,9 @@ let saveBtn = function (event) {
 
 //Get the number of wanted new/copied/deleted rows
 function addRows(){
-   return document.getElementById("addRows").value;
+   let num = document.getElementById("addRows").value;
+   console.log(num);
+   return (num == "") ? 1 : num;
 };
 
 document.getElementById("tbody1").addEventListener("dragover", dragover);
