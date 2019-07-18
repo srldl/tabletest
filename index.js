@@ -188,11 +188,12 @@ function new_count_id (id,innerhtml){
 
   if (event.keyCode == '9') {
     //Tab
-     let prev = document.getElementById(prev_selected_cell);
-      prev.classList.remove('selectCell');
+    remove_select(prev_selected_cell);
+    add_select(document.activeElement.parentNode.id);
   } else if (event.shiftKey && event.keyCode == 9) {
     //Shift+TAB
-    document.getElementById(prev_selected_cell).classList.remove('selectCell');
+    remove_select(prev_selected_cell);
+    add_select(document.activeElement.parentNode.id);
   }
 }
 
@@ -378,7 +379,7 @@ function addRows(){
 document.getElementById("tbody1").addEventListener("dragover", dragover);
 document.getElementById("tbody1").addEventListener("dragend", dragend);
 document.getElementById("tbody1").addEventListener("drop", drop);
-document.getElementById("tbody1").addEventListener('keydown', checkKey);
+document.getElementById("tbody1").addEventListener('keyup', checkKey);
 document.getElementById("tbody1").addEventListener('click', click);
 document.getElementById("newBtn").addEventListener('click', newBtn);
 document.getElementById("copyBtn").addEventListener('click', copyBtn);
