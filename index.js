@@ -113,13 +113,15 @@ function new_count_id (id,innerhtml){
 
   //Fetch all values from the chosen column.
   //Used as selections in the autocomplete list for that column
-  function  autocomplete_col_values(col) {
+  function  autocomplete_col_values(col,row) {
          let arr = [];
          for (let i=1;i<row_length;i++){
+            if (i === row) {continue};
             let val = document.getElementById("input_"+i+"_"+col);
             arr.push(val.value);
          };
-         return arr;
+
+         return [...new Set(arr)];
   }
 
   //Autocomplete function
@@ -145,7 +147,7 @@ function new_count_id (id,innerhtml){
        /*check if the item starts with the same letters as the text field value:*/
        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
          /*create a DIV element for each matching element:*/
-         b = document.createElement("DIV");
+         b = document.createElement("div");
          /*make the matching letters bold:*/
          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
          b.innerHTML += arr[i].substr(val.length);
@@ -178,7 +180,7 @@ function new_count_id (id,innerhtml){
   //Check if field use autocomplete
   if ((obj.autocompletes).includes(obj.headers[col-1])) {
     //If yes, fetch values
-    let arr = autocomplete_col_values(col);
+    let arr = autocomplete_col_values(col,row);
     autocomplete(arr,document.activeElement);
   }
 
