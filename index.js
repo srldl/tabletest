@@ -240,8 +240,10 @@ let drop = function (event) {
 let click = function (event) {
    //Autocomplete - close all lists
    closeAllLists(event.target);
+
    let doc = document.getElementById(event.target.id);
    if (doc === null) { return };
+
    let elem = doc.parentElement;
    //Remove borders from the previous selected cell
    if (prev_selected_cell !== '') { remove_select(prev_selected_cell)};
@@ -299,14 +301,14 @@ container.appendChild(tr);
 
 //Remove old cell selection
 function remove_select(prev_selected_cell){
-   if (prev_selected_cell) {
+   if (document.getElementById(prev_selected_cell)) {
      document.getElementById(prev_selected_cell).classList.remove('selectCell');
    }
 }
 
 //Add new cell selection
 function add_select(curr_selected_cell){
-    if (curr_selected_cell) {
+    if (document.getElementById(curr_selected_cell)) {
         prev_selected_cell = curr_selected_cell;
         document.getElementById(curr_selected_cell).classList.add('selectCell');
    }
