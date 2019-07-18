@@ -238,20 +238,25 @@ let drop = function (event) {
 
  //Upon clicking in table
 let click = function (event) {
+   console.log("click");
+   console.log(event.target);
+   //Autocomplete - close all lists
    closeAllLists(event.target);
+   let doc = document.getElementById(event.target.id);
+   if (doc === null) { return };
+   let elem = doc.parentElement;
+   //Remove borders from the previous selected cell
+   if (prev_selected_cell !== '') { remove_select(prev_selected_cell)};
+   //Update to select current cell
+   add_select(elem.id);
+
    if ((event.target.id).startsWith('input') || (event.target.id).startsWith('select')) {
-        let doc = document.getElementById(event.target.id);
-       let elem = doc.parentElement;
-       //Remove borders from the whole table
-       if (prev_selected_cell !== '') { document.getElementById(prev_selected_cell).classList.remove('selectCell');};
-        //Update this to be the previous selected cell
-        prev_selected_cell = elem.id;
-       //Mark selected cell
-       elem.classList.add("selectCell");
        //Make it draggable
        elem.draggable = "true";
        elem.ondragstart = addEventListener('dragstart', function(event) { event.dataTransfer.setData('text/plain', doc.value); });
- }};
+ }
+ console.log("click_end");
+};
 
 
 // new button pressed
@@ -295,6 +300,18 @@ container.appendChild(tr);
 }
 }
 
+//Remove old selection
+function remove_select(prev_selected_cell){
+     document.getElementById(prev_selected_cell).classList.remove('selectCell');
+}
+
+//Add new selection
+function add_select(curr_selected_cell){
+     prev_selected_cell = curr_selected_cell;
+     document.getElementById(curr_selected_cell).classList.add('selectCell');
+}
+
+
 // copy button pressed
 let copyBtn = function (event) {
     console.log('copyBtn');
@@ -302,8 +319,7 @@ let copyBtn = function (event) {
        alert("Please select a row");
     } else {    //Get the selected row
        let tr = (document.getElementById(prev_selected_cell)).parentElement;
-       document.getElementById(prev_selected_cell).classList.remove('selectCell');
-       console.log(tr);
+       remove_select(prev_selected_cell);
        //Get number of new rows wanted
        let num = addRows();
        for (let i=0;i<num;i++){
@@ -311,6 +327,7 @@ let copyBtn = function (event) {
             //cln.classList.remove('selectCell');
             container.appendChild(cln);
        }
+
     }
 };
 
