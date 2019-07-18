@@ -25,6 +25,7 @@ let drag_arr = [];
 let prev_selected_cell = '';
 
 
+//Create input cell
 function input_element(id_td,id,inputValue,typefield, autocomplete){
   var td = document.createElement("td");
   td.id = id_td;
@@ -41,6 +42,7 @@ function input_element(id_td,id,inputValue,typefield, autocomplete){
   return td;
 }
 
+//Create select cell
 function select_element(id_td, id_select, header_name, val){
   var td = document.createElement("td");
   td.id = id_td;
@@ -108,6 +110,7 @@ function new_count_id (id,innerhtml){
   } else {
     //The table body
     newRow(obj.dataRows.length,obj.dataRows);
+    //Set up autocomplete if existing
     let autocomplete = document.getElementsByClassName("autocomplete");
   }
 
@@ -120,7 +123,6 @@ function new_count_id (id,innerhtml){
             let val = document.getElementById("input_"+i+"_"+col);
             arr.push(val.value);
          };
-
          return [...new Set(arr)];
   }
 
@@ -186,8 +188,6 @@ function new_count_id (id,innerhtml){
 
   if (event.keyCode == '9') {
     //Tab
-     //console.log(prev_selected_cell);
-     //console.log(event.target);
      let prev = document.getElementById(prev_selected_cell);
       prev.classList.remove('selectCell');
   } else if (event.shiftKey && event.keyCode == 9) {
@@ -238,8 +238,6 @@ let drop = function (event) {
 
  //Upon clicking in table
 let click = function (event) {
-   console.log("click");
-   console.log(event.target);
    //Autocomplete - close all lists
    closeAllLists(event.target);
    let doc = document.getElementById(event.target.id);
@@ -255,7 +253,6 @@ let click = function (event) {
        elem.draggable = "true";
        elem.ondragstart = addEventListener('dragstart', function(event) { event.dataTransfer.setData('text/plain', doc.value); });
  }
- console.log("click_end");
 };
 
 
@@ -300,17 +297,31 @@ container.appendChild(tr);
 }
 }
 
-//Remove old selection
+//Remove old cell selection
 function remove_select(prev_selected_cell){
+   if (prev_selected_cell) {
      document.getElementById(prev_selected_cell).classList.remove('selectCell');
+   }
 }
 
-//Add new selection
+//Add new cell selection
 function add_select(curr_selected_cell){
-     prev_selected_cell = curr_selected_cell;
-     document.getElementById(curr_selected_cell).classList.add('selectCell');
+    if (curr_selected_cell) {
+        prev_selected_cell = curr_selected_cell;
+        document.getElementById(curr_selected_cell).classList.add('selectCell');
+   }
 }
 
+//Get the values of a row through the tr element
+//Returns a double array
+function get_row_values(tr) {
+  let arr = [];
+  for (let i=1;i<tr.childNodes.length-1; i++){
+    arr.push(tr.childNodes[i].childNodes[0].value);
+  }
+  arr.push(tr.childNodes[col_length-1].childNodes[0].data);
+  return [arr];
+}
 
 // copy button pressed
 let copyBtn = function (event) {
@@ -318,16 +329,17 @@ let copyBtn = function (event) {
     if (prev_selected_cell == '') {
        alert("Please select a row");
     } else {    //Get the selected row
-       let tr = (document.getElementById(prev_selected_cell)).parentElement;
-       remove_select(prev_selected_cell);
        //Get number of new rows wanted
        let num = addRows();
+       //Get input values from row to be copied
+       let tr = document.getElementById(prev_selected_cell).parentElement;
+       let arr = get_row_values(tr);
+       //Id is returned as well, remove it.
+       arr[0].pop();
+       //Create requested row(s) with the values
        for (let i=0;i<num;i++){
-            let cln = tr.cloneNode(true);
-            //cln.classList.remove('selectCell');
-            container.appendChild(cln);
+           newRow(1,arr);
        }
-
     }
 };
 
@@ -346,13 +358,18 @@ let delBtn = function (event) {
 let saveBtn = function (event) {
     console.log('saveBtn');
     container = document.getElementById("tbody1");
-    console.log(container);
+    let arr=[];
+    //Fetch values by row, store in double array
+    for (let i=1;i<row_length;i++){
+         let tr = get_row_values( container.childNodes[i]);
+         arr.push(tr);
+    }
+    console.log(arr);
 };
 
 //Get the number of wanted new/copied/deleted rows
 function addRows(){
    let num = document.getElementById("addRows").value;
-   console.log(num);
    return (num == "") ? 1 : num;
 };
 
@@ -366,6 +383,7 @@ document.getElementById("copyBtn").addEventListener('click', copyBtn);
 document.getElementById("delBtn").addEventListener('click', delBtn);
 document.getElementById("saveBtn").addEventListener('click', saveBtn);
 
+//Autocomplete
 function addActive(x) {
    /*a function to classify an item as "active":*/
    if (!x) return false;
@@ -377,13 +395,15 @@ function addActive(x) {
    x[currentFocus].classList.add("autocomplete-active");
  }
 
+ //Autocomplete
  function removeActive(x) {
-   console.log(removeActive);
    /*a function to remove the "active" class from all autocomplete items:*/
    for (var i = 0; i < x.length; i++) {
      x[i].classList.remove("autocomplete-active");
    }
  }
+
+ //Autocomplete
  function closeAllLists(input_field,elmnt) {
    /*close all autocomplete lists in the document,
    except the one passed as an argument:*/
