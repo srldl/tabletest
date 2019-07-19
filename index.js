@@ -1,5 +1,6 @@
 'use strict';
 
+//Testdata
 //the rows
 let dataRows=   [["A","Alibaba","2019-06-14T12:00:00Z","A"],["B","Alicante","2019-06-13T12:00:00Z","A"],
                 ["C","Allverdens","2019-06-14T12:00:00Z","Alt er veldig, veldig langt"],["D","Al Jazeera","2019-07-17T12:00:00Z","A"]];
@@ -9,13 +10,14 @@ let obj =  {  "dataRows": dataRows,
               "headers": ["project", "subproject", "event_date","fourt_event_on"],
               "headers_tooltip": ["project acronym","subproject acronym","start work date"],
               "selectlist": {"project":["A","B","C","D"]},
-              "autocompletes": ["subproject"],
+              "autocompletes": {"subproject":"internal"},
               "dateFields":["event_date"],
               "id": "exceltable",
               "sanitize":true
 };
 
 
+//Unfortunately, some global parameters
 //Holds the width of the table
 let col_length = obj.headers.length + 2;
 //This counter holds next row_number
@@ -77,14 +79,51 @@ function th_element(id,textContent, textTooltip){
   return th;
 }
 
-//Create count and id columns
-function new_count_id (id,innerhtml){
+//Create new td element
+function td_element (id,innerhtml){
     let td0 = document.createElement("td");
     td0.id = id;
     td0.innerHTML = innerhtml;
     return td0;
 }
 
+
+
+//Create the next row in the table
+//Caled by newBtn, copyBtn, and during table initialization
+function newRow(num,input_text){
+//Number of rows
+for (let i=0;i<num;i++){
+    let tr = document.createElement("tr");
+    //Count column
+    tr.appendChild(td_element('count_'+row_length,row_length));
+    //Second to almost last column is user info
+    let td;
+    for (let j=1;j<obj.headers.length+1;j++){
+      //Difference between empty row and row with input
+      let inp = (input_text == '') ? '' : (input_text[i][j-1]);
+
+      if (obj.selectlist.hasOwnProperty(obj.headers[j-1])) {  //Select field
+         td = select_element('td_'+row_length+'_'+j,'select_'+row_length+'_'+j,obj.headers[j-1],inp);
+
+      } else if (obj.dateFields.includes(obj.headers[j-1])){  //input date field
+          let date = (inp == '') ? '' : inp.substring(0,10);
+          td = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,date,'date',false);
+
+      } else {  //ordinary input field
+         td = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,inp,'text',true);
+      }
+      tr.appendChild(td);
+
+}
+//Id columns
+tr.appendChild(td_element('id_'+row_length,obj.id+'-'+row_length));
+row_length++;
+container.appendChild(tr);
+}
+}
+
+  //Table initialization
   //1. Create headers:
   let container_header = document.getElementById("header1");
 
@@ -115,6 +154,7 @@ function new_count_id (id,innerhtml){
     let autocomplete = document.getElementsByClassName("autocomplete");
   }
 
+  //Autocompletes internal function:
   //Fetch all values from the chosen column.
   //Used as selections in the autocomplete list for that column
   function  autocomplete_col_values(col,row) {
@@ -171,33 +211,6 @@ function new_count_id (id,innerhtml){
 };
 
 
-  // This function checks if an arrow key has been pressed
-  // If so, it changes focus
-  function checkKey(event) {
-  event = event || window.event;
-
-  let pos = document.activeElement.id.split("_");
-  let row = parseInt(pos[1]);
-  let col = parseInt(pos[2]);
-
-  //Check if field use autocomplete
-  if ((obj.autocompletes).includes(obj.headers[col-1])) {
-    //If yes, fetch values
-    let arr = autocomplete_col_values(col,row);
-    autocomplete(arr,document.activeElement);
-  }
-
-  if (event.keyCode == '9') {
-    //Tab
-    remove_select(prev_selected_cell);
-    add_select(document.activeElement.parentNode.id);
-  } else if (event.shiftKey && event.keyCode == 9) {
-    //Shift+TAB
-    remove_select(prev_selected_cell);
-    add_select(document.activeElement.parentNode.id);
-  }
-}
-
 //Drag and drop - drag over event
 let dragover = function(event){
       let id = event.target.id;
@@ -238,6 +251,38 @@ let drop = function (event) {
    event.preventDefault();
  };
 
+ // This function checks if an arrow key has been pressed
+ // If so, it changes focus
+ function checkKey(event) {
+ event = event || window.event;
+
+ let pos = document.activeElement.id.split("_");
+ let row = parseInt(pos[1]);
+ let col = parseInt(pos[2]);
+
+ //Check if field use autocomplete
+ if (obj.autocompletes[obj.headers[col-1]]) {
+   if (obj.autocompletes[obj.headers[col-1]] == 'internal' ) {
+   //If yes, fetch values
+   let arr = autocomplete_col_values(col,row);
+   autocomplete(arr,document.activeElement);
+ } else {
+   console.log("external list");
+ }
+ }
+
+ if (event.keyCode == '9') {
+   //Tab
+   remove_select(prev_selected_cell);
+   add_select(document.activeElement.parentNode.id);
+ } else if (event.shiftKey && event.keyCode == 9) {
+   //Shift+TAB
+   remove_select(prev_selected_cell);
+   add_select(document.activeElement.parentNode.id);
+ }
+}
+
+
  //Upon clicking in table
 let click = function (event) {
    //Autocomplete - close all lists
@@ -259,56 +304,48 @@ let click = function (event) {
  }
 };
 
+//Autocomplete
+function addActive(x) {
+   /*a function to classify an item as "active":*/
+   if (!x) return false;
+   /*start by removing the "active" class on all items:*/
+   removeActive(x);
+   if (currentFocus >= x.length) currentFocus = 0;
+   if (currentFocus < 0) currentFocus = (x.length - 1);
+   /*add class "autocomplete-active":*/
+   x[currentFocus].classList.add("autocomplete-active");
+ }
 
-// new button pressed
-let newBtn = function (event) {
-    console.log('newBtn');
-    //Get number of new rows wanted
-    let num = addRows();
-    newRow(num,"");
-};
+ //Autocomplete
+ function removeActive(x) {
+   /*a function to remove the "active" class from all autocomplete items:*/
+   for (var i = 0; i < x.length; i++) {
+     x[i].classList.remove("autocomplete-active");
+   }
+ }
 
-//Create the next row
-function newRow(num,input_text){
-//Number of rows
-for (let i=0;i<num;i++){
-    let tr = document.createElement("tr");
-    //Count column
-    tr.appendChild(new_count_id('count_'+row_length,row_length));
-    //Second to almost last column is user info
-    let td;
-    for (let j=1;j<obj.headers.length+1;j++){
-      //Difference between empty row and row with input
-      let inp = (input_text == '') ? '' : (input_text[i][j-1]);
-
-      if (obj.selectlist.hasOwnProperty(obj.headers[j-1])) {  //Select field
-         td = select_element('td_'+row_length+'_'+j,'select_'+row_length+'_'+j,obj.headers[j-1],inp);
-
-      } else if (obj.dateFields.includes(obj.headers[j-1])){  //input date field
-          let date = (inp == '') ? '' : inp.substring(0,10);
-          td = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,date,'date',false);
-
-      } else {  //ordinary input field
-         td = input_element('td_'+row_length+'_'+j,'input_'+row_length+'_'+j,inp,'text',true);
-      }
-      tr.appendChild(td);
-
-}
-//Id columns
-tr.appendChild(new_count_id('id_'+row_length,obj.id+'-'+row_length));
-row_length++;
-container.appendChild(tr);
-}
+ //Autocomplete
+ function closeAllLists(input_field,elmnt) {
+   /*close all autocomplete lists in the document,
+   except the one passed as an argument:*/
+   var x = document.getElementsByClassName("autocomplete-items");
+   for (var i = 0; i < x.length; i++) {
+     if (elmnt != x[i] && elmnt != input_field) {
+     x[i].parentNode.removeChild(x[i]);
+   }
+ }
 }
 
-//Remove old cell selection
+//Cell selection -called by click and keyup events
+//Remove old cell selection from last selected cell
 function remove_select(prev_selected_cell){
    if (document.getElementById(prev_selected_cell)) {
      document.getElementById(prev_selected_cell).classList.remove('selectCell');
    }
 }
 
-//Add new cell selection
+//Cell selection -called by click and keyup events
+//Add new cell selection to current cell
 function add_select(curr_selected_cell){
     if (document.getElementById(curr_selected_cell)) {
         prev_selected_cell = curr_selected_cell;
@@ -318,6 +355,7 @@ function add_select(curr_selected_cell){
 
 //SanitizeHTML from 2018 Chris Ferdinandi,
 //MIT License, https://gomakethings.com
+//Called from savebtn
 var sanitizeHTML = function (str) {
 	var temp = document.createElement('div');
 	temp.textContent = str;
@@ -325,7 +363,8 @@ var sanitizeHTML = function (str) {
 };
 
 //Get the values of a row through the tr element
-//Returns a double array
+//Returns a double arry with table values
+//Sanitizes, called by savebtn and copybtn
 function get_row_values(tr) {
   let arr = [];
   for (let i=1;i<tr.childNodes.length-1; i++){
@@ -337,6 +376,21 @@ function get_row_values(tr) {
   arr.push(tr.childNodes[col_length-1].childNodes[0].data);
   return [arr];
 }
+
+//Get the user input number of wanted new/copied rows
+//Called by newBtn and copyBtn
+function addRows(){
+   let num = document.getElementById("addRows").value;
+   return (num == "") ? 1 : num;
+};
+
+//new button pressed
+let newBtn = function (event) {
+    console.log('newBtn');
+    //Get number of new rows wanted
+    let num = addRows();
+    newRow(num,"");
+};
 
 // copy button pressed
 let copyBtn = function (event) {
@@ -382,12 +436,6 @@ let saveBtn = function (event) {
     console.log(arr);
 };
 
-//Get the number of wanted new/copied/deleted rows
-function addRows(){
-   let num = document.getElementById("addRows").value;
-   return (num == "") ? 1 : num;
-};
-
 document.getElementById("tbody1").addEventListener("dragover", dragover);
 document.getElementById("tbody1").addEventListener("dragend", dragend);
 document.getElementById("tbody1").addEventListener("drop", drop);
@@ -397,35 +445,3 @@ document.getElementById("newBtn").addEventListener('click', newBtn);
 document.getElementById("copyBtn").addEventListener('click', copyBtn);
 document.getElementById("delBtn").addEventListener('click', delBtn);
 document.getElementById("saveBtn").addEventListener('click', saveBtn);
-
-//Autocomplete
-function addActive(x) {
-   /*a function to classify an item as "active":*/
-   if (!x) return false;
-   /*start by removing the "active" class on all items:*/
-   removeActive(x);
-   if (currentFocus >= x.length) currentFocus = 0;
-   if (currentFocus < 0) currentFocus = (x.length - 1);
-   /*add class "autocomplete-active":*/
-   x[currentFocus].classList.add("autocomplete-active");
- }
-
- //Autocomplete
- function removeActive(x) {
-   /*a function to remove the "active" class from all autocomplete items:*/
-   for (var i = 0; i < x.length; i++) {
-     x[i].classList.remove("autocomplete-active");
-   }
- }
-
- //Autocomplete
- function closeAllLists(input_field,elmnt) {
-   /*close all autocomplete lists in the document,
-   except the one passed as an argument:*/
-   var x = document.getElementsByClassName("autocomplete-items");
-   for (var i = 0; i < x.length; i++) {
-     if (elmnt != x[i] && elmnt != input_field) {
-     x[i].parentNode.removeChild(x[i]);
-   }
- }
-}
