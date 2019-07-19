@@ -14,12 +14,18 @@ thead {
    top: 0;
    height: 30px;
    z-index: 1000; //Bring to front
+
+}
+
+th {
+  text-align: left;
 }
 
 /* Each table cell */
 td {
     border: 1px solid steelblue;
-    width: 200px;
+    width: auto;
+    max-width: 200px;
     height: 25px;
 }
 
@@ -42,9 +48,19 @@ input {
 }
 
 .selectCell { border: 2px solid #0000FF;
+  border-radius: 2px;
 }
 
-.dragCell { border: thick dotted #0000AA; }
+/*.selectCell::before {
+    content: "";
+    right: 0%;
+    bottom: 0%;
+    position: absolute;
+    border-right: 13px solid #0000FF;
+    border-bottom: 5px solid #0000FF;
+}*/
+
+.dragCell { border: 2px dotted #0000AA; }
 
 select {
     border: 0;

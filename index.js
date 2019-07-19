@@ -1,12 +1,12 @@
 'use strict';
 
 //the rows
-let dataRows=   [["A","Alibaba","2019-06-14T12:00:00Z"],["B","Alicante","2019-06-13T12:00:00Z"],
-                ["C","Allverdens","2019-06-14T12:00:00Z"],["D","Al Jazeera","2019-07-17T12:00:00Z"]];
+let dataRows=   [["A","Alibaba","2019-06-14T12:00:00Z","A"],["B","Alicante","2019-06-13T12:00:00Z","A"],
+                ["C","Allverdens","2019-06-14T12:00:00Z","Alt er veldig, veldig langt"],["D","Al Jazeera","2019-07-17T12:00:00Z","A"]];
 
 //Create object with input parameters
 let obj =  {  "dataRows": dataRows,
-              "headers": ["project", "subproject", "event_date"],
+              "headers": ["project", "subproject", "event_date","fourth"],
               "headers_tooltip": ["project acronym","subproject acronym","start work date"],
               "selectlist": {"project":["A","B","C","D"]},
               "autocompletes": ["subproject"],
