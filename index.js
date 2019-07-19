@@ -6,12 +6,13 @@ let dataRows=   [["A","Alibaba","2019-06-14T12:00:00Z","A"],["B","Alicante","201
 
 //Create object with input parameters
 let obj =  {  "dataRows": dataRows,
-              "headers": ["project", "subproject", "event_date","fourth"],
+              "headers": ["project", "subproject", "event_date","fourt_event_on"],
               "headers_tooltip": ["project acronym","subproject acronym","start work date"],
               "selectlist": {"project":["A","B","C","D"]},
               "autocompletes": ["subproject"],
               "dateFields":["event_date"],
-              "id": "exceltable"
+              "id": "exceltable",
+              "sanitize":true
 };
 
 
@@ -315,12 +316,23 @@ function add_select(curr_selected_cell){
    }
 }
 
+//SanitizeHTML from 2018 Chris Ferdinandi,
+//MIT License, https://gomakethings.com
+var sanitizeHTML = function (str) {
+	var temp = document.createElement('div');
+	temp.textContent = str;
+	return temp.innerHTML;
+};
+
 //Get the values of a row through the tr element
 //Returns a double array
 function get_row_values(tr) {
   let arr = [];
   for (let i=1;i<tr.childNodes.length-1; i++){
-    arr.push(tr.childNodes[i].childNodes[0].value);
+    let str = tr.childNodes[i].childNodes[0].value;
+    //sanitize input if requested
+    let temp = (obj.sanitize === false) ? str : sanitizeHTML(str);
+    arr.push(temp);
   }
   arr.push(tr.childNodes[col_length-1].childNodes[0].data);
   return [arr];
